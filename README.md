@@ -37,11 +37,9 @@ https://raw.githubusercontent.com/fanzouguo/install-linux/main/lib/initNodeJs.v1
 
 > 备份 Linux 服务器（ For Haya - tFrameV8 ）
 ``` shell
-curl https://raw.githubusercontent.com/fanzouguo/install-linux/main/lib/initBackup.sh | bash
+curl -o- https://raw.githubusercontent.com/fanzouguo/install-linux/main/lib/initBackup.sh | bash
 
 # 或者单步依次执行下列命令
 
-wget https://raw.githubusercontent.com/fanzouguo/install-linux/main/lib/svrBack.sh
-
-sh ./svrBack.sh
+wget -qO- https://raw.githubusercontent.com/fanzouguo/install-linux/main/lib/svrBack.sh | bash
 ```

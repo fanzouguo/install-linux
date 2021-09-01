@@ -3,7 +3,7 @@ The unmanned watching shell script for fast install the linux server.
 
 # 注意
 
-为避免网络原因导致 raw.aaaa 访问失败，可以事先添加以下 host 解析记录
+为避免网络原因导致 raw.githubusercontent 访问失败，可以事先添加以下 host 解析记录
 ```
 echo "185.199.108.133 raw.githubusercontent.com" >> /etc/hosts
 echo "185.199.109.133 raw.githubusercontent.com" >> /etc/hosts

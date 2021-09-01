@@ -21,6 +21,11 @@ curl https://raw.githubusercontent.com/fanzouguo/install-linux/main/src/install.
 ```
 
 > 安装 Nodejs - 10<v10.16.1>（ For Haya - tFrameV8 ）
+
+注：不采用 nvm 的原因有以下两点：
+
+1. 客户化的服务端部署成功后，不存在版本更新的情况（至少在 tFrame 平台机制下）
+2. 由于防火墙的原因，通过 raw.githubusercontent.com 的 nvm 安装脚本可能会访问异常，导致 svrInit 脚本执行不成功
 ```
 https://raw.githubusercontent.com/fanzouguo/install-linux/main/src/initNodeJs.v10.sh
 ```

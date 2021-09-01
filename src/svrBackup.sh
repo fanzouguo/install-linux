@@ -6,7 +6,7 @@ mkdir -p /smpoo_file/data/back/node_pj
 
 cp -rf /smpoo_file/http/nginx/www/static /smpoo_file/data/back/http/nginx/www
 cp -rf /smpoo_file/http/nginx/www/app /smpoo_file/data/back/http/nginx/www
-cp -rf /etc/nginx/conf/default.conf /smpoo_file/data/back/etc/nginx/conf.d
+cp -rf /etc/nginx/conf.d/default.conf /smpoo_file/data/back/etc/nginx/conf.d/
 cp -rf /smpoo_file/node_pj/package.json /smpoo_file/data/back/node_pj/
 cp -rf /smpoo_file/node_pj/
 

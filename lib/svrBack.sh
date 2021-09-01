@@ -1,5 +1,5 @@
 #!/bin/bash
-
+cd ~
 mkdir -p /smpoo_file/data/back/html/nginx/www
 mkdir -p /smpoo_file/data/back/etc/nginx/conf.d
 mkdir -p /smpoo_file/data/back/node_pj

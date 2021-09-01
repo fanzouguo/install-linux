@@ -39,7 +39,9 @@ https://raw.githubusercontent.com/fanzouguo/install-linux/main/lib/initNodeJs.v1
 ``` shell
 curl https://raw.githubusercontent.com/fanzouguo/install-linux/main/lib/initBackup.sh | bash
 
-# 或者
+# 或者单步依次执行下列命令
 
-wget https://raw.githubusercontent.com/fanzouguo/install-linux/main/lib/initBackup.sh | bash
+wget https://raw.githubusercontent.com/fanzouguo/install-linux/main/lib/svrBack.sh
+
+sh ./svrBack.sh
 ```

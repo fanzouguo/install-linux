@@ -45,7 +45,7 @@ echo "nameserver 8.8.8.8" >>/etc/resolv.conf
 #
 
 # 0.4 全局安装基本组件
-dnf install -y createrepo curl openssl-devel libevent-devel libxml2-devel jansson-devel epel-release gcc gcc-c++ kernel-devel m4 make ncurses-devel openssl-devel pygpgme SDL telnet-server telnet unixODBC unixODBC-devel wxBase wxGTK wxGTK-gl vim yum-utils
+dnf install -y git createrepo curl expect openssl-devel libevent-devel libxml2-devel jansson-devel epel-release gcc gcc-c++ kernel-devel m4 make ncurses-devel openssl-devel pygpgme SDL telnet-server telnet unixODBC unixODBC-devel wxBase wxGTK wxGTK-gl vim yum-utils
 #
 
 # 步骤列表
@@ -374,6 +374,23 @@ systemctl disable dnf-makecache.timer
 # 创建 mysql初始化脚本文件 init.sql
 tmpPwd=""
 mysqladmin -uroot -p$tmpPwd password $dbPwdRoot
+
+# 创建 mysql 自动初始化运行脚本
+# cat >> ~/initMysql.sh <<EOF
+echo -e "#!/usr/bin/expect\n\
+set timeout 3\n\
+spawn mysql -u root -p\n\
+expect {\n\
+\"password:\" {send \"${dbPwdRoot}\r\"};\n\
+}\n\
+expect {\n\
+\"mysql>\" {send \"source ~/init.sql;\r\"};\n\
+}\n\
+expect {\n\
+\"mysql>\" {send \"quit\r\"};\n\
+}\n\
+interact" >>  /root/initMysql.sh
+# EOF
 
 echo "" >~/init.sql
 echo "USE mysql;" >~/init.sql

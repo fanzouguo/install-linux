@@ -101,6 +101,27 @@ function tipFirst() {
 	echo -e $lineStr2
 	echo -e $lineStr
 }
+# 步骤提示
+function stepConfirm() {
+	echo
+	echo -e "\e[44;37;1m 是否：${steps[$stepCt]} ?[安装(y 或回车)| 忽略(n)] \e[0m"
+	echo -e "\e[44;37;1m choose：${steps[$stepCt]} ?[Install(y 或 Enter)| Ignore(n)] \e[0m"
+	read -p "" need
+	case $need in
+	y)
+		stepResult[$stepCt]=1
+		ckPort "${ports[$stepCt]}"
+		;;
+	n)
+		stepResult[$stepCt]=0
+		unInstall=$unInstall" "${steps[$stepCt]}
+		;;
+	*)
+		stepResult[$stepCt]=1
+		ckPort "${ports[$stepCt]}"
+		;;
+	esac
+}
 # 操作提示
 function tipOpt() {
 	echo -e "\e[0;31;1m $1 \e[0m"
@@ -113,14 +134,30 @@ function tipFoot() {
 	echo $showStr${steps[$stepCt]}" done..."
 	stepCt=$(($stepCt + 1))
 }
+# 步骤跳过提示
+function IgnorFoot() {
+	echo ${steps[$stepCt]}"已跳过..."
+	echo ${steps[$stepCt]}" skiped..."
+	stepCt=$(($stepCt + 1))
+}
 #
 
 clear
-
+# 执行环境确认
+tipFirst "为确保MYSQL自动配置能够生效，本脚本需要在ECS本地环境执行，请确认当前执行环境是否正确。 \n To be sure the  MYSQL auto configuration become effective immediately, you should run this script file on ECS end. \n Are you sure it's correct?"
+echo "Continue(y) Quit(x)"
+select evt in "继续(y)" "退出(x)"; do
+	case $evt in
+	"退出(x)")
+		exit 1
+		;;
+	esac
+	break
+done
+#
 echo "标准主路径："$dfDirName
 for item in ${steps[*]}; do
-	stepResult[$stepCt]=1
-	ckPort "${ports[$stepCt]}"
+	stepConfirm
 	stepCt=$stepCt+1
 done
 #
@@ -134,6 +171,8 @@ echo ""
 for intItem in ${stepResult[*]}; do
 	if [ $intItem == 1 ]; then
 		echo -e ${steps[$stepCt]}"："\\u2714
+		# else
+		#     echo -e ${steps[$stepCt]}"："\\u2718
 	fi
 	stepCt=$(($stepCt + 1))
 done
@@ -161,30 +200,35 @@ echo ""
 
 stepCt=0
 # Step1：环境初始化
-tipOpt ${steps[$stepCt]}
+if [ ${stepResult[$stepCt]} == 1 ]; then
+	tipOpt ${steps[$stepCt]}
 
 	# 1.1 创建主路径
-if [ ! -d "/"$dfDirName ]; then
-	mkdir -p -m 777 "/"$dfDirName"/data/cert"
-	mkdir -p -m 777 "/"$dfDirName"/db_data/mysql"
-	mkdir -p -m 777 "/"$dfDirName"/db_data/mongo"
-	mkdir -p -m 777 "/"$dfDirName"/db_data/redis"
-	mkdir -p -m 777 "/"$dfDirName"/logs/mysql"
-	mkdir -p -m 777 "/"$dfDirName"/logs/mongo"
-	mkdir -p -m 777 "/"$dfDirName"/logs/redis"
-	mkdir -p -m 777 "/"$dfDirName"/node_pj"
-	mkdir -p -m 777 "/"$dfDirName"/html/www"
-fi
+	if [ ! -d "/"$dfDirName ]; then
+		mkdir -p -m 777 "/"$dfDirName"/data/cert"
+		mkdir -p -m 777 "/"$dfDirName"/db_data/mysql"
+		mkdir -p -m 777 "/"$dfDirName"/db_data/mongo"
+		mkdir -p -m 777 "/"$dfDirName"/db_data/redis"
+		mkdir -p -m 777 "/"$dfDirName"/logs/mysql"
+		mkdir -p -m 777 "/"$dfDirName"/logs/mongo"
+		mkdir -p -m 777 "/"$dfDirName"/logs/redis"
+		mkdir -p -m 777 "/"$dfDirName"/node_pj"
+		mkdir -p -m 777 "/"$dfDirName"/html/www"
+	fi
 	#
-tipFoot
+	tipFoot
+else
+	IgnorFoot
+fi
 #
 
 # Step2： 安装Nginx
-tipOpt ${steps[$stepCt]}
-cat >> /etc/yum.repos.d/nginx.repo <<EOF
+if [ ${stepResult[$stepCt]} == 1 ]; then
+	tipOpt ${steps[$stepCt]}
+	cat >> /etc/yum.repos.d/nginx.repo <<EOF
 [nginx-stable]
 name=nginx stable repo
-baseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/
+baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
 gpgcheck=1
 enabled=1
 gpgkey=https://nginx.org/keys/nginx_signing.key
@@ -192,111 +236,126 @@ module_hotfixes=true
 
 [nginx-mainline]
 name=nginx mainline repo
-baseurl=http://nginx.org/packages/mainline/centos/\$releasever/\$basearch/
+baseurl=http://nginx.org/packages/mainline/centos/$releasever/$basearch/
 gpgcheck=1
 enabled=0
 gpgkey=https://nginx.org/keys/nginx_signing.key
 module_hotfixes=true
 EOF
 
-sudo yum-config-manager --enable nginx-mainline
-sudo dnf install nginx-1.17.1
-cp /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak
-svrRoot="/"$dfDirName"/html/www;"
-sed -i "s#/usr/share/nginx/html;#$svrRoot#" /etc/nginx/conf.d/default.conf
+	sudo yum-config-manager --enable nginx-mainline
+	sudo dnf install nginx-1.17.1
+	cp /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak
+	svrRoot="/"$dfDirName"/html/www;"
+	sed -i "s#/usr/share/nginx/html;#$svrRoot#" /etc/nginx/conf.d/default.conf
 
-echo '启动Nginx服务'
-echo 'Start the Nginx service'
-systemctl restart nginx.service
-systemctl enable nginx.service
-curl 127.0.0.1
+	echo '启动Nginx服务'
+	echo 'Start the Nginx service'
+	systemctl restart nginx.service
+	systemctl enable nginx.service
+	curl 127.0.0.1
 
-echo '==========================='
-echo '              Nginx 版本'
-echo '              Nginx Ver'
-nginx -v
-echo '==========================='
-tipFoot
+	echo '==========================='
+	echo '              Nginx 版本'
+	echo '              Nginx Ver'
+	nginx -v
+	echo '==========================='
+	tipFoot
+else
+	IgnorFoot
+fi
 #
 
 # Step3： 安装Mysql
-tipOpt ${steps[$stepCt]}
-# 在线安装mysql8，@mysql模块将安装MySQL及其所有依赖项
-sudo dnf install @mysql -y
+if [ ${stepResult[$stepCt]} == 1 ]; then
+	tipOpt ${steps[$stepCt]}
+	# 在线安装mysql8，@mysql模块将安装MySQL及其所有依赖项
+	sudo dnf install @mysql -y
 
-cp /etc/my.cnf /etc/my.cnf.back
-sed -i "s#datadir=/.*#datadir=/$dfDirName/db_data/mysql#" /etc/my.cnf
-sed -i "s#socket=/.*#socket=/$dfDirName/db_data/mysql/mysql.sock#" /etc/my.cnf
-echo "" >>/etc/my.cnf
-echo "[client]" >>/etc/my.cnf
-echo "default-character-set=utf8" >>/etc/my.cnf
-echo "socket=/$dfDirName/db_data/mysql/mysql.sock" >>/etc/my.cnf
-echo "" >>/etc/my.cnf
-echo "[mysql]" >>/etc/my.cnf
-echo "default-character-set=utf8" >>/etc/my.cnf
-echo "socket=/$dfDirName/db_data/mysql/mysql.sock" >>/etc/my.cnf
+	cp /etc/my.cnf /etc/my.cnf.back
+	sed -i "s#datadir=/.*#datadir=/$dfDirName/db_data/mysql#" /etc/my.cnf
+	sed -i "s#socket=/.*#socket=/$dfDirName/db_data/mysql/mysql.sock#" /etc/my.cnf
+	echo "" >>/etc/my.cnf
+	echo "[client]" >>/etc/my.cnf
+	echo "default-character-set=utf8" >>/etc/my.cnf
+	echo "socket=/$dfDirName/db_data/mysql/mysql.sock" >>/etc/my.cnf
+	echo "" >>/etc/my.cnf
+	echo "[mysql]" >>/etc/my.cnf
+	echo "default-character-set=utf8" >>/etc/my.cnf
+	echo "socket=/$dfDirName/db_data/mysql/mysql.sock" >>/etc/my.cnf
 
-echo '启动Mysql服务'
-systemctl enable mysqld.service
-systemctl restart mysqld.service
+	echo '启动Mysql服务'
+	systemctl enable mysqld.service
+	systemctl restart mysqld.service
 
-echo '==========================='
-echo '              Mysql 版本'
-mysql --help | grep Distrib
-rpm -qa | grep mysql
-systemctl status mysqld
-echo '==========================='
-tipFoot
+	echo '==========================='
+	echo '              Mysql 版本'
+	mysql --help | grep Distrib
+	rpm -qa | grep mysql
+	systemctl status mysqld
+	echo '==========================='
+	tipFoot
+else
+	IgnorFoot
+fi
 #
 
 # Step4： 安装PostgreSql
-tipOpt ${steps[$stepCt]}
-# Install the repository RPM:
-sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+if [ ${stepResult[$stepCt]} == 1 ]; then
+	tipOpt ${steps[$stepCt]}
+	# Install the repository RPM:
+	sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
-# Disable the built-in PostgreSQL module:
-sudo dnf -qy module disable postgresql
+	# Disable the built-in PostgreSQL module:
+	sudo dnf -qy module disable postgresql
 
-# Install PostgreSQL:
-sudo dnf install -y postgresql13-server
+	# Install PostgreSQL:
+	sudo dnf install -y postgresql13-server
 
-# Optionally initialize the database and enable automatic start:
-/usr/pgsql-13/bin/postgresql-13-setup initdb
-systemctl enable postgresql-13
-systemctl start postgresql-13
+	# Optionally initialize the database and enable automatic start:
+	/usr/pgsql-13/bin/postgresql-13-setup initdb
+	systemctl enable postgresql-13
+	systemctl start postgresql-13
 
-echo '==========================='
-echo '              PostgreSql 版本'
-# PostgreSql --help | grep Distrib
-# rpm -qa | grep PostgreSql
-echo '==========================='
-tipFoot
+	echo '==========================='
+	echo '              PostgreSql 版本'
+	# PostgreSql --help | grep Distrib
+	# rpm -qa | grep PostgreSql
+	echo '==========================='
+	tipFoot
+else
+	IgnorFoot
+fi
 #
 
 # Step5： 安装NodeJs
-tipOpt ${steps[$stepCt]}
-echo "准备安装 NodeJs: "$VER_NUM
-cd /root
-wget "https://nodejs.org/dist/"$VER_NUM"/node-"$VER_NUM"-linux-x64.tar.xz"
-tar -xvf "node-"$VER_NUM"-linux-x64.tar.xz"
-cd /usr/local/
-mv "/root/node-"$VER_NUM"-linux-x64 ."
-mv "node-"$VER_NUM"-linux-x64 nodejs"
-echo 'export PATH=$PATH:/usr/local/nodejs/bin' >> /etc/profile
-source /etc/profile
+if [ ${stepResult[$stepCt]} == 1 ]; then
+	tipOpt ${steps[$stepCt]}
+	echo "准备安装 NodeJs: "$VER_NUM
+	cd /root
+	wget "https://nodejs.org/dist/"$VER_NUM"/node-"$VER_NUM"-linux-x64.tar.xz"
+	tar -xvf "node-"$VER_NUM"-linux-x64.tar.xz"
+	cd /usr/local/
+	mv "/root/node-"$VER_NUM"-linux-x64 ."
+	mv "node-"$VER_NUM"-linux-x64 nodejs"
+	echo 'export PATH=$PATH:/usr/local/nodejs/bin' >> /etc/profile
+	source /etc/profile
 
-echo '==========================='
-echo '              NodeJs 版本'
-echo '              NodeJs Ver'
-node -v
-echo '==========================='
+	echo '==========================='
+	echo '              NodeJs 版本'
+	echo '              NodeJs Ver'
+	node -v
+	echo '==========================='
 
-echo '==========================='
-echo '              NPM 版本'
-echo '              NPM Ver'
-npm -v
-echo '==========================='
-tipFoot
+	echo '==========================='
+	echo '              NPM 版本'
+	echo '              NPM Ver'
+	npm -v
+	echo '==========================='
+	tipFoot
+else
+	IgnorFoot
+fi
 #
 
 # 环境清理

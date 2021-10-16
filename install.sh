@@ -198,7 +198,6 @@ curl 127.0.0.1
 
 echo '==========================='
 echo '              Nginx 版本'
-echo '              Nginx Ver'
 nginx -v
 echo '==========================='
 tipFoot
@@ -263,24 +262,20 @@ tipFoot
 # Step5： 安装NodeJs
 tipOpt ${steps[$stepCt]}
 echo "准备安装 NodeJs: "$VER_NUM
-cd /root
-wget "https://nodejs.org/dist/"$VER_NUM"/node-"$VER_NUM"-linux-x64.tar.xz"
-tar -xvf "node-"$VER_NUM"-linux-x64.tar.xz"
-cd /usr/local/
-mv "/root/node-"$VER_NUM"-linux-x64 ."
-mv "node-"$VER_NUM"-linux-x64 nodejs"
+nodeFileName="node-"$VER_NUM"-linux-x64"
+wget "https://nodejs.org/dist/"$VER_NUM"/"$nodeFileName".tar.xz"
+tar -xvf $nodeFileName".tar.xz"
+mv "/root/"$nodeFileName /usr/local/nodejs
 echo 'export PATH=$PATH:/usr/local/nodejs/bin' >> /etc/profile
 source /etc/profile
 
 echo '==========================='
 echo '              NodeJs 版本'
-echo '              NodeJs Ver'
 node -v
 echo '==========================='
 
 echo '==========================='
 echo '              NPM 版本'
-echo '              NPM Ver'
 npm -v
 echo '==========================='
 tipFoot

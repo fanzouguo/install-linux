@@ -45,7 +45,7 @@ echo "nameserver 8.8.8.8" >>/etc/resolv.conf
 #
 
 # 0.4 全局安装基本组件
-dnf install -y git createrepo curl expect openssl-devel libevent-devel libxml2-devel jansson-devel epel-release gcc gcc-c++ kernel-devel m4 make ncurses-devel openssl-devel pygpgme SDL telnet-server telnet unixODBC unixODBC-devel wxBase wxGTK wxGTK-gl vim yum-utils
+dnf install -y git createrepo curl expect openssl-devel libevent-devel libxml2-devel jansson-devel epel-release gcc gcc-c++ kernel-devel m4 make ncurses-devel openssl-devel pygpgme SDL telnet-server telnet tcl tclx tcl-devel unixODBC unixODBC-devel wxBase wxGTK wxGTK-gl vim yum-utils
 #
 
 # 步骤列表

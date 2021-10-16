@@ -13,7 +13,7 @@ sudo sed -i.bak \
 sudo dnf makecache
 
 # 更改 EPEL
-sudo dnf install epel-release
+sudo dnf install -y epel-release
 sudo sed -i.bak \
 -e 's|^metalink|#metalink|' \
 -e 's|^#baseurl=|baseurl=|' \
@@ -24,11 +24,10 @@ sudo dnf makecache
 # 添加 dnf fastest mirror
 sed -i '$a fastestmirror=True' /etc/dnf/dnf.conf
 
-dnf clean metadata
-dnf clean all
-dnf makecache
-dnf update -y
-cd ~
+sudo dnf clean metadata
+sudo dnf clean all
+sudo dnf makecache
+sudo dnf update -y
 #
 
 # 0.2 关闭seinux
@@ -44,7 +43,8 @@ echo "nameserver 8.8.8.8" >>/etc/resolv.conf
 #
 
 # 0.4 全局安装基本组件
-dnf install -y git createrepo curl expect openssl-devel libevent-devel libxml2-devel jansson-devel epel-release gcc gcc-c++ kernel-devel m4 make ncurses-devel openssl-devel pygpgme SDL telnet-server telnet tcl tclx tcl-devel unixODBC unixODBC-devel wxBase wxGTK wxGTK-gl vim yum-utils
+sudo dnf install -y git createrepo curl expect openssl-devel libevent-devel libxml2-devel jansson-devel epel-release gcc gcc-c++ kernel-devel m4 make ncurses-devel openssl-devel SDL telnet-server telnet tcl tcl-devel unixODBC unixODBC-devel vim yum-utils
+# pygpgme tclx wxBase wxGTK wxGTK-gl
 #
 
 # 步骤列表
@@ -270,7 +270,7 @@ fi
 if [ ${stepResult[$stepCt]} == 1 ]; then
 	tipOpt ${steps[$stepCt]}
 	# 在线安装mysql8，@mysql模块将安装MySQL及其所有依赖项
-	dnf install @mysql -y
+	sudo dnf install @mysql -y
 
 	cp /etc/my.cnf /etc/my.cnf.back
 	sed -i "s#datadir=/.*#datadir=/$dfDirName/db_data/mysql#" /etc/my.cnf
@@ -304,13 +304,13 @@ fi
 if [ ${stepResult[$stepCt]} == 1 ]; then
 	tipOpt ${steps[$stepCt]}
 	# Install the repository RPM:
-	dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+	sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
 	# Disable the built-in PostgreSQL module:
-	dnf -qy module disable postgresql
+	sudo dnf -qy module disable postgresql
 
 	# Install PostgreSQL:
-	dnf install -y postgresql13-server
+	sudo dnf install -y postgresql13-server
 
 	# Optionally initialize the database and enable automatic start:
 	/usr/pgsql-13/bin/postgresql-13-setup initdb
@@ -360,8 +360,8 @@ fi
 
 # 环境清理
 # 删除无用孤立的软件包
-dnf clean all
-dnf autoremove
+sudo dnf clean all
+sudo dnf autoremove
 # 根文件夹授权
 chmod -R 777 "/"$dfDirName
 # 防火墙重新加载，以便生效之前的放行

@@ -1,9 +1,8 @@
 #!/bin/sh
 
 # 0.1 更改系统源为 163 源
-cd /etc/yum.repos.d
 # 更换主源文件
-cp CentOS-Base.repo CentOS-Base.repo.bk
+cp /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bk
 curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo
 sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo
 sudo sed -i.bak \

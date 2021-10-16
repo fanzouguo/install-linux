@@ -27,7 +27,7 @@ sed -i '$a fastestmirror=True' /etc/dnf/dnf.conf
 sudo dnf clean metadata
 sudo dnf clean all
 sudo dnf makecache
-sudo dnf update -y
+sudo dnf -y update
 #
 
 # 0.2 关闭seinux
@@ -49,8 +49,6 @@ sudo dnf install -y git createrepo curl expect openssl-devel libevent-devel libx
 
 # 步骤列表
 echo "环境初始化(Env_init) | 安装Nginx | 安装Mysql | 安装PostgreSql"
-
-echo "1、init the Environmental | 2、install Nginx | 3、install Mysql | 4、install PostgreSql | 5、install NodeJs"
 
 steps=("Env_init" "install_Nginx" "install_Mysql" "install_PostgreSql" "install_NodeJs")
 ports=("-1" "80" "3306" "5432" "-1")
@@ -78,8 +76,17 @@ function ckPort() {
 	for subItem in ${item[*]}; do
 		if [ $subItem -gt 0 ]; then
 			echo "根据安装选项，将自动开启端口：$subItem"
-			echo "the port [ $subItem ] will be auto allow!"
 			firewall-cmd --permanent "--add-port=$subItem/tcp"
+		fi
+	done
+}
+# 显示端口放行情况
+function showPort() {
+	item=$1
+	for subItem in ${item[*]}; do
+		if [ $subItem -gt 0 ]; then
+			echo "端口：$subItem"
+			firewall-cmd "--query-port=$subItem/tcp"
 		fi
 	done
 }
@@ -126,9 +133,7 @@ done
 
 # 确认安装信息
 echo "目标主路径："$dfDirName
-echo "Target folder is "$dfDirName
 stepCt=0
-echo ""
 echo ""
 for intItem in ${stepResult[*]}; do
 	if [ $intItem == 1 ]; then
@@ -180,7 +185,7 @@ module_hotfixes=true
 EOF
 
 sudo yum-config-manager --enable nginx-mainline
-sudo dnf install nginx-1.17.1
+sudo dnf install -y nginx-1.17.1
 cp /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak
 svrRoot="/"$dfDirName"/html/www;"
 sed -i "s#/usr/share/nginx/html;#$svrRoot#" /etc/nginx/conf.d/default.conf
@@ -202,19 +207,20 @@ tipFoot
 # Step3： 安装Mysql
 tipOpt ${steps[$stepCt]}
 # 在线安装mysql8，@mysql模块将安装MySQL及其所有依赖项
-sudo dnf install @mysql -y
+sudo dnf install -y @mysql
 
 cp /etc/my.cnf /etc/my.cnf.back
 sed -i "s#datadir=/.*#datadir=/$dfDirName/db_data/mysql#" /etc/my.cnf
 sed -i "s#socket=/.*#socket=/$dfDirName/db_data/mysql/mysql.sock#" /etc/my.cnf
-echo "" >>/etc/my.cnf
-echo "[client]" >>/etc/my.cnf
-echo "default-character-set=utf8" >>/etc/my.cnf
-echo "socket=/$dfDirName/db_data/mysql/mysql.sock" >>/etc/my.cnf
-echo "" >>/etc/my.cnf
-echo "[mysql]" >>/etc/my.cnf
-echo "default-character-set=utf8" >>/etc/my.cnf
-echo "socket=/$dfDirName/db_data/mysql/mysql.sock" >>/etc/my.cnf
+
+echo -e "\n\
+[client]\n\
+default-character-set=utf8\n\
+socket=/$dfDirName/db_data/mysql/mysql.sock\n\
+\n\
+[mysql]\n\
+default-character-set=utf8\n\
+socket=/$dfDirName/db_data/mysql/mysql.sock" >>/etc/my.cnf
 
 echo '启动Mysql服务'
 systemctl enable mysqld.service
@@ -245,10 +251,11 @@ sudo dnf install -y postgresql13-server
 systemctl enable postgresql-13
 systemctl start postgresql-13
 
+
 echo '==========================='
 echo '              PostgreSql 版本'
-# PostgreSql --help | grep Distrib
-# rpm -qa | grep PostgreSql
+rpm -qa | grep postgresql
+systemctl status postgresql-13
 echo '==========================='
 tipFoot
 #
@@ -280,14 +287,17 @@ tipFoot
 #
 
 # 环境清理
-# 删除无用孤立的软件包
+echo '环境清理'
 sudo dnf clean all
-sudo dnf autoremove
+echo '删除无用孤立的软件包'
+sudo dnf -y autoremove
 # 根文件夹授权
 chmod -R 777 "/"$dfDirName
 # 防火墙重新加载，以便生效之前的放行
+echo '防火墙重载'
 firewall-cmd --reload
 # 关闭 dnf-makecache 的定时器
+echo '关闭 dnf-makecache 的定时器'
 systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
 
@@ -311,11 +321,17 @@ quit\r"
 /usr/bin/expect <<-EOF
 
 set time 30
-spawn mysql -u root -p$dbPwdDev
+spawn mysql -u root -p$dbPwdRoot
 expect {
 "mysql>" { send "$initSqlStr" }
 }
 expect eof
 EOF
 
+
+for item in ${steps[*]}; do
+	stepResult[$stepCt]=1
+	ckPort "${ports[$stepCt]}"
+	stepCt=$stepCt+1
+done
 tipFirst "安装完成"

@@ -27,7 +27,7 @@ sed -i '$a fastestmirror=True' /etc/dnf/dnf.conf
 sudo dnf clean metadata
 sudo dnf clean all
 sudo dnf makecache
-sudo dnf -y update
+sudo dnf update -y
 #
 
 # 0.2 关闭seinux
@@ -50,10 +50,13 @@ sudo dnf install -y git createrepo curl expect openssl-devel libevent-devel libx
 # 步骤列表
 echo "环境初始化(Env_init) | 安装Nginx | 安装Mysql | 安装PostgreSql"
 
+echo "1、init the Environmental | 2、install Nginx | 3、install Mysql | 4、install PostgreSql | 5、install NodeJs"
+
 steps=("Env_init" "install_Nginx" "install_Mysql" "install_PostgreSql" "install_NodeJs")
 ports=("-1" "80" "3306" "5432" "-1")
 # 步骤选择结果
 stepResult=(0 0 0 0 0)
+unInstall=""
 
 # 全局参数
 # 默认主路径
@@ -76,17 +79,8 @@ function ckPort() {
 	for subItem in ${item[*]}; do
 		if [ $subItem -gt 0 ]; then
 			echo "根据安装选项，将自动开启端口：$subItem"
+			echo "the port [ $subItem ] will be auto allow!"
 			firewall-cmd --permanent "--add-port=$subItem/tcp"
-		fi
-	done
-}
-# 显示端口放行情况
-function showPort() {
-	item=$1
-	for subItem in ${item[*]}; do
-		if [ $subItem -gt 0 ]; then
-			echo "端口：$subItem"
-			firewall-cmd "--query-port=$subItem/tcp"
 		fi
 	done
 }
@@ -133,7 +127,9 @@ done
 
 # 确认安装信息
 echo "目标主路径："$dfDirName
+echo "Target folder is "$dfDirName
 stepCt=0
+echo ""
 echo ""
 for intItem in ${stepResult[*]}; do
 	if [ $intItem == 1 ]; then
@@ -141,9 +137,28 @@ for intItem in ${stepResult[*]}; do
 	fi
 	stepCt=$(($stepCt + 1))
 done
+echo "========================"
+echo "已被忽略的安装项"
+echo "The skipped installation item is:"
+echo $unInstall
+
+echo -e "\e[44;37;1m 以上信息是否正确？ Yes(y) | No(n) \e[0m"
+echo -e "\e[44;37;1m Are you sure this is all correct ? Yes(y) | No(n) \e[0m"
+read -p "" isRight
+case $isRight in
+y) ;;
+
+n)
+	exit 1
+	;;
+*) ;;
+
+esac
 #
 
 # 执行安装
+echo ""
+
 stepCt=0
 # Step1：环境初始化
 tipOpt ${steps[$stepCt]}
@@ -185,8 +200,8 @@ module_hotfixes=true
 EOF
 
 sudo yum-config-manager --enable nginx-mainline
-sudo dnf install -y nginx-1.17.1
-cp -rf /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak
+sudo dnf install nginx-1.17.1
+cp /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak
 svrRoot="/"$dfDirName"/html/www;"
 sed -i "s#/usr/share/nginx/html;#$svrRoot#" /etc/nginx/conf.d/default.conf
 
@@ -198,135 +213,9 @@ curl 127.0.0.1
 
 echo '==========================='
 echo '              Nginx 版本'
+echo '              Nginx Ver'
 nginx -v
 echo '==========================='
 tipFoot
 #
 
-# Step3： 安装Mysql
-tipOpt ${steps[$stepCt]}
-# 在线安装mysql8，@mysql模块将安装MySQL及其所有依赖项
-sudo dnf install -y @mysql
-
-cp /etc/my.cnf /etc/my.cnf.back
-sed -i "s#datadir=/.*#datadir=/$dfDirName/db_data/mysql#" /etc/my.cnf
-sed -i "s#socket=/.*#socket=/$dfDirName/db_data/mysql/mysql.sock#" /etc/my.cnf
-
-echo -e "\n\
-[client]\n\
-default-character-set=utf8\n\
-socket=/$dfDirName/db_data/mysql/mysql.sock\n\
-\n\
-[mysql]\n\
-default-character-set=utf8\n\
-socket=/$dfDirName/db_data/mysql/mysql.sock" >>/etc/my.cnf
-
-echo '启动Mysql服务'
-systemctl enable mysqld.service
-systemctl restart mysqld.service
-
-echo '==========================='
-echo '              Mysql 版本'
-mysql --help | grep Distrib
-rpm -qa | grep mysql
-systemctl status mysqld
-echo '==========================='
-tipFoot
-#
-
-# Step4： 安装PostgreSql
-tipOpt ${steps[$stepCt]}
-# Install the repository RPM:
-sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-
-# Disable the built-in PostgreSQL module:
-sudo dnf -qy module disable postgresql
-
-# Install PostgreSQL:
-sudo dnf install -y postgresql13-server
-
-# Optionally initialize the database and enable automatic start:
-/usr/pgsql-13/bin/postgresql-13-setup initdb
-systemctl enable postgresql-13
-systemctl start postgresql-13
-
-
-echo '==========================='
-echo '              PostgreSql 版本'
-rpm -qa | grep postgresql
-systemctl status postgresql-13
-echo '==========================='
-tipFoot
-#
-
-# Step5： 安装NodeJs
-tipOpt ${steps[$stepCt]}
-echo "准备安装 NodeJs: "$VER_NUM
-nodeFileName="node-"$VER_NUM"-linux-x64"
-wget "https://nodejs.org/dist/"$VER_NUM"/"$nodeFileName".tar.xz"
-tar -xvf $nodeFileName".tar.xz"
-mv "/root/"$nodeFileName /usr/local/nodejs
-echo 'export PATH=$PATH:/usr/local/nodejs/bin' >> /etc/profile
-source /etc/profile
-
-echo '==========================='
-echo '              NodeJs 版本'
-node -v
-echo '==========================='
-
-echo '==========================='
-echo '              NPM 版本'
-npm -v
-echo '==========================='
-tipFoot
-#
-
-# 环境清理
-echo '环境清理'
-sudo dnf clean all
-echo '删除无用孤立的软件包'
-sudo dnf -y autoremove
-# 根文件夹授权
-chmod -R 777 "/"$dfDirName
-# 防火墙重新加载，以便生效之前的放行
-echo '防火墙重载'
-firewall-cmd --reload
-# 关闭 dnf-makecache 的定时器
-echo '关闭 dnf-makecache 的定时器'
-systemctl stop dnf-makecache.timer
-systemctl disable dnf-makecache.timer
-
-# 创建 mysql初始化脚本文件 init.sql
-tmpPwd=""
-mysqladmin -uroot -p$tmpPwd password $dbPwdRoot
-
-# mysql 账号和远程用户权限初始化脚本
-initSqlStr="USE mysql;\r\
-UPDATE user SET host='%' WHERE user = 'root';\r\
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$dbPwdRoot' WITH GRANT OPTION;\r\
-FLUSH PRIVILEGES;\r\
-CREATE user 'dev'@'%' IDENTIFIED BY '$dbPwdDev';\r\
-FLUSH PRIVILEGES;\r\
-GRANT ALL ON *.* TO 'dev'@'%';\r\
-FLUSH PRIVILEGES;\r\
-SET PASSWORD FOR 'dev'@'%' = PASSWORD('$dbPwdDev');\r\
-FLUSH PRIVILEGES;\r\
-quit\r"
-
-/usr/bin/expect <<-EOF
-
-set time 30
-spawn mysql -u root -p$dbPwdRoot
-expect {
-"mysql>" { send "$initSqlStr" }
-}
-expect eof
-EOF
-
-
-for item in ${steps[*]}; do
-	stepResult[$stepCt]=1
-	ckPort "${ports[$stepCt]}"
-	stepCt=$stepCt+1
-done
-tipFirst "安装完成"

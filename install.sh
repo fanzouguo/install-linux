@@ -375,40 +375,27 @@ systemctl disable dnf-makecache.timer
 tmpPwd=""
 mysqladmin -uroot -p$tmpPwd password $dbPwdRoot
 
-# 创建 mysql 自动初始化运行脚本
-# cat >> ~/initMysql.sh <<EOF
-echo -e "#!/usr/bin/expect\n\
-set timeout 3\n\
-spawn mysql -u root -p\n\
-expect {\n\
-\"password:\" {send \"${dbPwdRoot}\r\"};\n\
-}\n\
-expect {\n\
-\"mysql>\" {send \"source ~/init.sql;\r\"};\n\
-}\n\
-expect {\n\
-\"mysql>\" {send \"quit\r\"};\n\
-}\n\
-interact" >>  /root/initMysql.sh
-# EOF
+# mysql 账号和远程用户权限初始化脚本
+initSqlStr="USE mysql;\r\
+UPDATE user SET host='%' WHERE user = 'root';\r\
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$dbPwdRoot' WITH GRANT OPTION;\r\
+FLUSH PRIVILEGES;\r\
+CREATE user 'dev'@'%' IDENTIFIED BY '$dbPwdDev';\r\
+FLUSH PRIVILEGES;\r\
+GRANT ALL ON *.* TO 'dev'@'%';\r\
+FLUSH PRIVILEGES;\r\
+SET PASSWORD FOR 'dev'@'%' = PASSWORD('$dbPwdDev');\r\
+FLUSH PRIVILEGES;\r\
+quit\r"
 
-echo "" >~/init.sql
-echo "USE mysql;" >~/init.sql
-echo "-- 允许root用户远程连接" >>~/init.sql
-echo "UPDATE user SET host='%' WHERE user = 'root';" >>~/init.sql
-echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$dbPwdRoot' WITH GRANT OPTION;FLUSH PRIVILEGES;" >>~/init.sql
-echo "" >> ~/init.sql
-echo "-- 创建dev用户" >>~/init.sql
-echo "create user 'dev'@'%' IDENTIFIED BY '$dbPwdDev';FLUSH PRIVILEGES;" >>~/init.sql
-echo "-- 给dev用户的远程访问授权： " >>~/init.sql
-echo "GRANT ALL ON *.* TO 'dev'@'%';FLUSH PRIVILEGES;" >>~/init.sql
-echo "" >>~/init.sql
-echo "-- 给远程访问的dev用户设置密码：" >>~/init.sql
-echo "SET PASSWORD FOR 'dev'@'%' = PASSWORD('$dbPwdDev');FLUSH PRIVILEGES;" >>~/init.sql
+/usr/bin/expect <<-EOF
+
+set time 30
+spawn mysql -u root -p$dbPwdDev
+expect {
+"mysql>" { send "$initSqlStr" }
+}
+expect eof
+EOF
 
 tipFirst "安装完成"
-echo ""
-echo "使用 mysql -uroot -p登陆后，运行"
-echo "use new Password of you set to run 'mysql -uroot -p' to sign in mysql service and run the following command:"
-echo "source ~/init.sql"
-echo "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"

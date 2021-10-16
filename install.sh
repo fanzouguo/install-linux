@@ -56,7 +56,6 @@ steps=("Env_init" "install_Nginx" "install_Mysql" "install_PostgreSql" "install_
 ports=("-1" "80" "3306" "5432" "-1")
 # 步骤选择结果
 stepResult=(0 0 0 0 0)
-unInstall=""
 
 # 全局参数
 # 默认主路径
@@ -137,28 +136,9 @@ for intItem in ${stepResult[*]}; do
 	fi
 	stepCt=$(($stepCt + 1))
 done
-echo "========================"
-echo "已被忽略的安装项"
-echo "The skipped installation item is:"
-echo $unInstall
-
-echo -e "\e[44;37;1m 以上信息是否正确？ Yes(y) | No(n) \e[0m"
-echo -e "\e[44;37;1m Are you sure this is all correct ? Yes(y) | No(n) \e[0m"
-read -p "" isRight
-case $isRight in
-y) ;;
-
-n)
-	exit 1
-	;;
-*) ;;
-
-esac
 #
 
 # 执行安装
-echo ""
-
 stepCt=0
 # Step1：环境初始化
 tipOpt ${steps[$stepCt]}

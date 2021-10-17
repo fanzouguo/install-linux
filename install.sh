@@ -1,5 +1,101 @@
 #!/bin/sh
 
+# 全局参数
+# 默认主路径
+dfDirName="smpoo_file"
+# 步骤计数器
+stepCt=0
+# NodeJs 版本
+VER_NODE_JS="v14.15.4"
+# 本机内网IP地址
+ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
+#
+
+# 全局函数库
+# 检查端口
+function ckPort() {
+	item=$1
+	for subItem in ${item[*]}; do
+		if [ $subItem -gt 0 ]; then
+			echo "根据安装选项，将自动开启端口：$subItem"
+			firewall-cmd --zone=public "--add-port=$subItem/tcp" --permanent
+			# 防火墙重新加载，以便生效之前的放行
+			firewall-cmd --reload
+		fi
+	done
+}
+# 显示端口放行情况
+function showPort() {
+	item=$1
+	for subItem in ${item[*]}; do
+		if [ $subItem -gt 0 ]; then
+			echo "端口：$subItem"
+			firewall-cmd "--query-port=$subItem/tcp"
+		fi
+	done
+}
+# 重要提示
+function tipFirst() {
+	strLen=$(echo $1 | wc -L)
+	sl=$(($strLen + 6))
+	cmds="%"$sl"s"
+	outs=$(printf $cmds | tr ' ' -)
+	lineStr="\e[41;33;1m |$outs| \e[0m"
+	lineStr2="\e[41;33;1m |  $1 >>>    | \e[0m"
+	if [ $2 ]; then
+		lineStr="\e[44;37;1m |$outs| \e[0m"
+		lineStr2="\e[44;37;1m |  $1 >>>    | \e[0m"
+	fi
+
+	echo -e $lineStr
+	echo -e $lineStr2
+	echo -e $lineStr
+}
+# 操作提示
+function tipOpt() {
+	echo -e "\e[0;31;1m $1 \e[0m"
+}
+# 步骤结束提示
+function tipFoot() {
+	# 输入100个等号
+	showStr=$(printf '%100s\n' | tr ' ' =)
+	echo $showStr${steps[$stepCt]}"完成..."
+	echo $showStr${steps[$stepCt]}" done..."
+	stepCt=$(($stepCt + 1))
+}
+#
+
+clear
+# 0 版本提示
+tipOpt "=============================================================================="
+tipOpt "·                                                                            ·"
+tipOpt "·                      This scricpt is base on:                              ·"
+tipOpt "·                       -- CentOS 8 64bit --                               ·"
+tipOpt "·                                                                            ·"
+tipOpt "=============================================================================="
+osName=`cat /etc/redhat-release | awk -F ' Linux release ' '{print $1}'`
+releasetmp=`cat /etc/redhat-release | awk '{match($0,"release ")
+print substr($0,RSTART+RLENGTH)}' | awk -F '.' '{print $1}'`
+echo ""
+echo ""
+echo  -e "\e[44;37;1m 当前系统版本: \e[0m"
+cat /etc/redhat-release
+echo ""
+echo ""
+echo -e "\e[44;37;1m 是否正确： ?[安装(y 或回车)| 取消安装(n)] \e[0m"
+read -p "" isRight
+case $isRight in
+y) ;;
+
+n)
+	exit 1
+	;;
+*) ;;
+
+esac
+#
+
+
 # 0.1 更改系统源为 163 源
 # 更换主源文件
 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bk
@@ -54,72 +150,6 @@ steps=("Env_init" "install_Nginx" "install_Mysql" "install_PostgreSql" "install_
 ports=("-1" "80" "3306" "5432" "-1")
 # 步骤选择结果
 stepResult=(0 0 0 0 0)
-
-# 全局参数
-# 默认主路径
-dfDirName="smpoo_file"
-# 步骤计数器
-stepCt=0
-# mysql 默认root密码
-dbPwdRoot="Smpoo@2015"
-dbPwdDev="Dev_2015"
-# NodeJs 版本
-VER_NUM="v14.15.4"
-# 本机内网IP地址
-ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
-#
-
-# 全局函数库
-# 检查端口
-function ckPort() {
-	item=$1
-	for subItem in ${item[*]}; do
-		if [ $subItem -gt 0 ]; then
-			echo "根据安装选项，将自动开启端口：$subItem"
-			firewall-cmd --permanent "--add-port=$subItem/tcp"
-		fi
-	done
-}
-# 显示端口放行情况
-function showPort() {
-	item=$1
-	for subItem in ${item[*]}; do
-		if [ $subItem -gt 0 ]; then
-			echo "端口：$subItem"
-			firewall-cmd "--query-port=$subItem/tcp"
-		fi
-	done
-}
-# 重要提示
-function tipFirst() {
-	strLen=$(echo $1 | wc -L)
-	sl=$(($strLen + 6))
-	cmds="%"$sl"s"
-	outs=$(printf $cmds | tr ' ' -)
-	lineStr="\e[41;33;1m |$outs| \e[0m"
-	lineStr2="\e[41;33;1m |  $1 >>>    | \e[0m"
-	if [ $2 ]; then
-		lineStr="\e[44;37;1m |$outs| \e[0m"
-		lineStr2="\e[44;37;1m |  $1 >>>    | \e[0m"
-	fi
-
-	echo -e $lineStr
-	echo -e $lineStr2
-	echo -e $lineStr
-}
-# 操作提示
-function tipOpt() {
-	echo -e "\e[0;31;1m $1 \e[0m"
-}
-# 步骤结束提示
-function tipFoot() {
-	# 输入100个等号
-	showStr=$(printf '%100s\n' | tr ' ' =)
-	echo $showStr${steps[$stepCt]}"完成..."
-	echo $showStr${steps[$stepCt]}" done..."
-	stepCt=$(($stepCt + 1))
-}
-#
 
 clear
 
@@ -247,9 +277,16 @@ sudo dnf install -y postgresql13-server
 
 # Optionally initialize the database and enable automatic start:
 /usr/pgsql-13/bin/postgresql-13-setup initdb
+
+# 修改配置文件允许授信登录以便后续更改
+sudo sed -i.bak \
+-e 's|^local   all             all                                     peer|local   all             all                                     trust|' \
+/var/lib/pgsql/13/data/pg_hba.conf
+
+systemctl restart postgresql-13
+
 systemctl enable postgresql-13
 systemctl start postgresql-13
-
 
 echo '==========================='
 echo '              PostgreSql 版本'
@@ -261,9 +298,9 @@ tipFoot
 
 # Step5： 安装NodeJs
 tipOpt ${steps[$stepCt]}
-echo "准备安装 NodeJs: "$VER_NUM
-nodeFileName="node-"$VER_NUM"-linux-x64"
-wget "https://nodejs.org/dist/"$VER_NUM"/"$nodeFileName".tar.xz"
+echo "准备安装 NodeJs: "$VER_NODE_JS
+nodeFileName="node-"$VER_NODE_JS"-linux-x64"
+wget "https://nodejs.org/dist/"$VER_NODE_JS"/"$nodeFileName".tar.xz"
 tar -xvf $nodeFileName".tar.xz"
 mv "/root/"$nodeFileName /usr/local/nodejs
 echo 'export PATH=$PATH:/usr/local/nodejs/bin' >> /etc/profile
@@ -288,41 +325,29 @@ echo '删除无用孤立的软件包'
 sudo dnf -y autoremove
 # 根文件夹授权
 chmod -R 777 "/"$dfDirName
-# 防火墙重新加载，以便生效之前的放行
-echo '防火墙重载'
-firewall-cmd --reload
 # 关闭 dnf-makecache 的定时器
 echo '关闭 dnf-makecache 的定时器'
 systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
 
-# 创建 mysql初始化脚本文件 init.sql
-tmpPwd=""
-mysqladmin -uroot -p$tmpPwd password $dbPwdRoot
 
-# mysql 账号和远程用户权限初始化脚本
-initSqlStr="USE mysql;\r\
-UPDATE user SET host='%' WHERE user = 'root';\r\
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$dbPwdRoot' WITH GRANT OPTION;\r\
-FLUSH PRIVILEGES;\r\
-CREATE user 'dev'@'%' IDENTIFIED BY '$dbPwdDev';\r\
-FLUSH PRIVILEGES;\r\
-GRANT ALL ON *.* TO 'dev'@'%';\r\
-FLUSH PRIVILEGES;\r\
-SET PASSWORD FOR 'dev'@'%' = PASSWORD('$dbPwdDev');\r\
-FLUSH PRIVILEGES;\r\
-quit\r"
+# 执行数据库初始化脚本
+# MySql 账号和远程用户权限初始化脚本
+# PostgreSql 账号和远程用户权限初始化脚本
 
-/usr/bin/expect <<-EOF
+# 公网开放 PostgeSql 访问权限
+# 执行脚本
+sudo sed -i.bak \
+-e 's|^local   all             all                                     trust|local   all             all                                     md5|' \
+-e 's|^local   replication     all                                     peer|local   replication     all                                     md5|' \
+/var/lib/pgsql/13/data/pg_hba.conf
 
-set time 30
-spawn mysql -u root -p$dbPwdRoot
-expect {
-"mysql>" { send "$initSqlStr" }
-}
-expect eof
-EOF
+echo "host    all             all             0.0.0.0/0               md5" >> /var/lib/pgsql/13/data/pg_hba.conf
 
+sudo sed -i.bak \
+-e "s|^#listen_addresses = 'localhost'|listen_addresses = '\*'|" \
+/var/lib/pgsql/13/data/postgresql.conf
+systemctl restart postgresql-13
 
 for item in ${steps[*]}; do
 	stepResult[$stepCt]=1

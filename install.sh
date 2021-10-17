@@ -358,4 +358,6 @@ for item in ${steps[*]}; do
 	ckPort "${ports[$stepCt]}"
 	stepCt=$stepCt+1
 done
+
+cat ./initSqlLog
 tipFirst "安装完成"

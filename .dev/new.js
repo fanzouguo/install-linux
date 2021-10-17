@@ -5,6 +5,7 @@ const inquirer = require('inquirer');
 const shelljs = require('shelljs');
 const { series } = require('gulp');
 
+const _devBase = process.cwd();
 const VER_POLICY = {
 	major: 0,
 	minor: 1,
@@ -62,30 +63,12 @@ const BUILD_OPT = {
 	NAME_APP: '',
 	// package.json 文件名
 	NAME_FILE_PKG: 'package.json',
-	// tmind-cli 配置参数文件名
-	NAME_FILE_TMIND: '.tMind',
-	// 工作区全局仓库安装路径
-	PATH_REPO: '',
-	// 依赖包的版本号
-	VER_DEPEND: {},
 	// 构建前的版本号
 	VER_BEFORE: '',
 	// 当前构建项目的 package.json
 	CURR_PKG: {},
 	// 本次构建要执行的 github 指令集
 	CMD_GIT: [],
-	// 当前 package.json 配置中是否允许发布到npm
-	PUB_ALLOW: false,
-	// 本次 NPM 的发布是否成功
-	PUB_SUCC: false,
-	/** 本项目所依赖的关键包
-	 *
-	 */
-	LIST_PKG_DEPEND: [],
-	/** 要拷贝的静态资源列表
-	 *
-	 */
-	LIST_FILE_COPY: [],
 	/** .dev/conf环境是否需要重新初始化
 	 *
 	 */
@@ -203,19 +186,21 @@ class PathMgr {
 	static getPackageJson(basePath) {
 		return this.getJsonFile(basePath, BUILD_OPT.NAME_FILE_PKG);
 	}
-
-	/** 读取指定根路径下的指定文件
-	 *
-	 * @param basePath 根路径，如果为空字符或 nullLike 则代表 process.cwd
-	 * @param suffix
-	 * @returns
-	 */
-	static getFile(basePath, ...suffix) {
-		return fs.readFileSync(this.getPath(basePath, ...suffix)).toString();
-	}
 }
+
+
+// 0、初始化工作区 NPM 仓库地址
+const STEP_0_REPO = async cb => {
+	// 获取当前构建程序的 package.json 配置
+	const _objPkg = PathMgr.getPackageJson();
+	BUILD_OPT.CURR_PKG = _objPkg;
+	BUILD_OPT.VER_BEFORE = _objPkg.version;
+	// 获取当前构建程序的程序名称
+	BUILD_OPT.NAME_APP = _objPkg.name;
+};
+
 // 0、环境和变量准备
-const STEP_0_Ask = async cb => {
+const STEP_1_Ask = async cb => {
 	tClear();
 	echo.tRow('', '初始化...');
 	const execer = questions(BUILD_OPT.NEED_EVN);
@@ -241,15 +226,6 @@ const STEP_4_UpPkg = async cb => {
 	});
 	// verArr[_offset_] = verArr[_offset_] + 1;
 	BUILD_OPT.CURR_PKG.version = newVerArr.join('.');
-	for (const v in BUILD_OPT.VER_DEPEND) {
-		if (BUILD_OPT.CURR_PKG.dependencies[v]) {
-			// @ts-ignore
-			BUILD_OPT.CURR_PKG.dependencies[v] = BUILD_OPT.VER_DEPEND[v];
-		} else if (BUILD_OPT.CURR_PKG.devDependencies[v]) {
-			// @ts-ignore
-			BUILD_OPT.CURR_PKG.devDependencies[v] = BUILD_OPT.VER_DEPEND[v];
-		}
-	}
 	await writeFile(PathMgr.getPath('', BUILD_OPT.NAME_FILE_PKG), JSON.stringify(BUILD_OPT.CURR_PKG, null, 2));
 	cb();
 };
@@ -285,6 +261,7 @@ const STEP_5_SaveToGit = async cb => {
 	}
 	cb();
 };
+
 // 完成
 const STEP_Done = cb => {
 	const { consoleStr } = smpoo();
@@ -296,10 +273,6 @@ const STEP_Done = cb => {
 	tEcho('', `当前版本：v${BUILD_OPT.VER_BEFORE} —> v${BUILD_OPT.CURR_PKG.version}`, 'INFO');
 	echo.tLine('--------------------------');
 	tEcho('', '构建完成', 'SUCC');
-	if (BUILD_OPT.PUB_ALLOW && BUILD_OPT.PUB_SUCC) {
-		tEcho('\n');
-		tEcho('发布完成，请注意更改引用该包的程序的 package.json 中申明的版本号！\n\n\n\n', '注意！！！', 'WARN');
-	}
 	const appName = BUILD_OPT.CURR_PKG.name;
 	// @ts-ignore
 	shelljs.exec(`yarn list ${appName}`);
@@ -308,7 +281,8 @@ const STEP_Done = cb => {
 
 const execBuild = () => {
 	return series(
-		STEP_0_Ask,
+		STEP_0_REPO,
+		STEP_1_Ask,
 		STEP_4_UpPkg,
 		STEP_5_SaveToGit,
 		STEP_Done

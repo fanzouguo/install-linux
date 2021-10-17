@@ -5,10 +5,10 @@ set dbPwdRoot "Smpoo@2015"
 set dbPwdDev "Dev@2015"
 set dbPwdProd "SmpooProd@2021"
 # set tblName "mysql"
-# 清除 root 密码并授权远程登录
-set strClearRootPwd "UPDATE mysql.user SET host='%', authentication_string='' WHERE user='root';\r"
 # 修改 root 密码
-set strChangeRootPwd "ALTER user 'root'@'%' IDENTIFIED BY '$dbPwdRoot';\r"
+set strChangeRootPwd "ALTER user 'root'@'localhost' IDENTIFIED BY '$dbPwdRoot';\r"
+# 授权 root 远程登录
+set strClearRootPwd "UPDATE mysql.user SET host='%' WHERE user='root';\r"
 # 创建 DEV 用户
 set strUserDev "CREATE user 'dev'@'%' IDENTIFIED BY '$dbPwdDev';CREATE user 'prod'@'%' IDENTIFIED BY '$dbPwdProd';\r"
 # 创建 prod 用户
@@ -29,10 +29,10 @@ expect {
 "mysql>" {send "USE mysql;\r"};
 }
 expect {
-"mysql>" {send $strClearRootPwd};
+"mysql>" {send $strChangeRootPwd};
 }
 expect {
-"mysql>" {send $strChangeRootPwd};
+"mysql>" {send $strClearRootPwd};
 }
 expect {
 "mysql>" {send $strUserDev};

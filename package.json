@@ -1,6 +1,6 @@
 {
   "name": "install-linux",
-  "version": "9.0.3",
+  "version": "10.0.0",
   "description": "The unmanned watching shell script for fast install the linux server.",
   "private": true,
   "main": "",

@@ -419,8 +419,8 @@ tipGreen 版本号
 nginx -v
 rpm -qa | grep mysql
 rpm -qa | grep postgresql
-node -v
-npm -v
+tipOpt "node 版本重启后，node -v 查看"
+tipOpt "npm 版本重启后，npm -v 查看"
 getLine
 # 输出 SMPOO_LOGO
 tipFinish

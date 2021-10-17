@@ -398,8 +398,9 @@ echo ""
 echo ""
 getLine
 tipGreen 端口
-portAll=`firewall-cmd --zone=public --list-ports`
-tipGreen $portAll
+# portAll=`firewall-cmd --zone=public --list-ports`
+# tipGreen $portAll
+firewall-cmd --zone=public --list-ports
 echo ""
 echo ""
 getLine

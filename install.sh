@@ -96,7 +96,7 @@ esac
 echo "执行安装...."
 cd /root
 # 0.1 预下载SQL预处理脚本
-wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/initSql.sh
+wget -O -c -t 0 https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/initSql.sh
 chmod +x ./initSql.sh
 
 # 0.1 更改系统源为 163 源

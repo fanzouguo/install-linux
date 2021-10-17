@@ -95,6 +95,10 @@ n)
 esac
 #
 
+cd /root
+# 0.1 预下载SQL预处理脚本
+wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/initSql.sh
+chmod +x ./initSql.sh
 
 # 0.1 更改系统源为 163 源
 # 更换主源文件
@@ -332,6 +336,7 @@ systemctl disable dnf-makecache.timer
 
 
 # 执行数据库初始化脚本
+./initSql.sh
 # MySql 账号和远程用户权限初始化脚本
 # PostgreSql 账号和远程用户权限初始化脚本
 

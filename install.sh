@@ -85,16 +85,15 @@ echo ""
 echo -e "\e[44;37;1m 是否正确： ?[安装(y 或回车)| 取消安装(n)] \e[0m"
 read -p "" isRight
 case $isRight in
-y) ;;
-
 n)
+	echo "安装已取消！"
 	exit 1
 	;;
-*) ;;
 
 esac
 #
 
+echo "执行安装...."
 cd /root
 # 0.1 预下载SQL预处理脚本
 wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/initSql.sh

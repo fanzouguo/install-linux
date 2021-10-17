@@ -335,7 +335,7 @@ systemctl disable dnf-makecache.timer
 
 
 # 执行数据库初始化脚本
-./initSql.sh
+./initSql.sh >> initSqlLog
 # MySql 账号和远程用户权限初始化脚本
 # PostgreSql 账号和远程用户权限初始化脚本
 

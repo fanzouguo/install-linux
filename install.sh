@@ -24,16 +24,6 @@ function ckPort() {
 		fi
 	done
 }
-# 显示端口放行情况
-function showPort() {
-	item=$1
-	for subItem in ${item[*]}; do
-		if [ $subItem -gt 0 ]; then
-			echo "端口：$subItem"
-			firewall-cmd "--query-port=$subItem/tcp"
-		fi
-	done
-}
 # 重要提示
 function tipFirst() {
 	strLen=$(echo $1 | wc -L)
@@ -55,13 +45,43 @@ function tipFirst() {
 function tipOpt() {
 	echo -e "\e[0;31;1m $1 \e[0m"
 }
+# 绿色提示
+function tipGreen() {
+	echo -e "\e[0;32;1m $1 \e[0m"
+}
 # 步骤结束提示
 function tipFoot() {
 	# 输入100个等号
 	showStr=$(printf '%100s\n' | tr ' ' =)
 	echo $showStr${steps[$stepCt]}"完成..."
-	echo $showStr${steps[$stepCt]}" done..."
 	stepCt=$(($stepCt + 1))
+}
+# 打印品牌LOGO
+function tipFinish() {
+	echo  -e "\033[34m       ___           ___           ___           ___           ___      \033[0m"
+	echo  -e "\033[34m      /\\  \\         /\\__\\         /\\  \\         /\\  \\         /\\  \\     \033[0m"
+	echo  -e "\033[34m     /::\\  \\       /::|  |       /::\\  \\       /::\\  \\       /::\\  \\    \033[0m"
+	echo  -e "\033[34m    /:/\\ \\  \\     /:|:|  |      /:/\\:\\  \\     /:/\\:\\  \\     /:/\\:\\  \\   \033[0m"
+	echo  -e "\033[34m   _\\:\\-\\ \\  \\   /:/|:|__|__   /::\\-\\:\\  \\   /:/  \\:\\  \\   /:/  \\:\\  \\  \033[0m"
+	echo  -e "\033[34m  /\\ \\:\\ \\ \\__\\ /:/ |::::\\__\\ /:/\\:\\ \\:\\__\\ /:/__/ \\:\\__\\ /:/__/ \\:\\__\\  \033[0m"
+	echo  -e "\033[34m  \\:\\ \\:\\ \\/__/ \\/__/--/:/  / \\/__\\:\\/:/  / \\:\\  \\ /:/  / \\:\\  \\ /:/  /  \033[0m"
+	echo  -e "\033[34m   \\:\\ \\:\\__\\         /:/  /       \\::/  /   \\:\\  /:/  /   \\:\\  /:/  /  \033[0m"
+	echo  -e "\033[34m    \\:\\/:/  /        /:/  /         \\/__/     \\:\\/:/  /     \\:\\/:/  /   \033[0m"
+	echo  -e "\033[34m     \\::/  /        /:/  /                     \\::/  /       \\::/  /    \033[0m"
+	echo  -e "\033[34m      \\/__/         \\/__/                       \\/__/         \\/__/     \033[0m"
+	echo ""
+	echo  -e "\033[34m                        上海深普软件有限公司 - www.smpoo.com \033[0m"
+}
+function getshellwidth() {
+  echo `stty size|awk '{print $2}'`
+  # return 0 # return是返回 成功或者失败的
+  # 调用的时候只需要上面的输出就行， 他会将标准输出return回来
+}
+# 输出满屏横线
+function getLine() {
+  shellwidth=`getshellwidth`
+  lineStr=` yes "-" | sed $shellwidth'q' | tr -d '\n'`
+  echo $lineStr
 }
 #
 
@@ -96,7 +116,7 @@ esac
 echo "执行安装...."
 cd /root
 # 0.1 预下载SQL预处理脚本
-wget -O -c -t 0 https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/initSql.sh
+wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/lib/sql/initSql.sh
 chmod +x ./initSql.sh
 
 # 0.1 更改系统源为 163 源
@@ -123,9 +143,9 @@ sudo dnf makecache
 # 添加 dnf fastest mirror
 sed -i '$a fastestmirror=True' /etc/dnf/dnf.conf
 
-sudo dnf clean metadata
-sudo dnf clean all
-sudo dnf makecache
+# sudo dnf clean metadata
+# sudo dnf clean all
+# sudo dnf makecache
 sudo dnf -y update
 #
 
@@ -359,5 +379,54 @@ for item in ${steps[*]}; do
 	stepCt=$stepCt+1
 done
 
-cat ./initSqlLog
+echo ""
+echo ""
 tipFirst "安装完成"
+# 显示安装报告
+tipGreen "=============================================================================="
+tipGreen "·                                                                            ·"
+tipGreen "·                                安 装 报 告                                 ·"
+tipGreen "·                                                                            ·"
+tipGreen "=============================================================================="
+echo ""
+getLine
+tipGreen 数据库初始化
+cat ./initSqlLog
+echo ""
+echo ""
+getLine
+tipGreen 端口
+portAll=`firewall-cmd --zone=public --list-ports`
+tipGreen $portAll
+echo ""
+echo ""
+getLine
+tipGreen NGINX 服务状态
+systemctl status nginx
+getLine
+tipGreen MySql 服务状态
+systemctl status mysqld
+getLine
+tipGreen PostgeSql 服务状态
+systemctl status postgresql-13
+
+echo ""
+echo ""
+getLine
+tipGreen 版本号
+nginx -v
+rpm -qa | grep mysql
+rpm -qa | grep postgresql
+node -v
+npm -v
+getLine
+# 输出 SMPOO_LOGO
+tipFinish
+echo ""
+echo ""
+echo ""
+echo ""
+echo ""
+echo ""
+echo ""
+echo ""

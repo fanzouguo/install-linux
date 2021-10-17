@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# This is newth version.
+
 # 全局参数
 # 默认主路径
 dfDirName="smpoo_file"

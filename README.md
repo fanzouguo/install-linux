@@ -22,6 +22,9 @@ curl https://raw.githubusercontent.com/fanzouguo/install-linux/main/install.sh |
 curl -o-  https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/install.sh | bash
 wget -qO- https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/install.sh | bash
 git clone git@github.com:fanzouguo/install-linux.git ~/initSvr
+
+# 若因版本缓存问题导致下载到了旧版，可改用
+curl -o-  https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@仓库最新版本号/install.sh | bash
 ```
 
 > 安装 Nodejs - 10<v10.16.1>（ For Haya - tFrameV8 ）

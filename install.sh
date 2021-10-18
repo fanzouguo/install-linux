@@ -146,7 +146,7 @@ sudo sed -i.bak \
 sudo dnf makecache
 
 # 添加 dnf fastest mirror
-sed -i '$a fastestmirror=True' /etc/dnf/dnf.conf
+sed -i -e '$a fastestmirror=True' /etc/dnf/dnf.conf
 
 # sudo dnf clean metadata
 # sudo dnf clean all
@@ -155,23 +155,27 @@ sudo dnf -y update
 #
 
 # 0.2 关闭seinux
-sed -i "s#SELINUX=.*#SELINUX=disabled#" /etc/selinux/config
+sed -i -e "s#SELINUX=.*#SELINUX=disabled#" /etc/selinux/config
 setenforce 0
 systemctl enable firewalld
 systemctl start firewalld.service
 #
 
-# 0.3 为系统添加DNS
+# 0.3 为系统添加DNS 和用户
 echo "nameserver 8.8.8.8" >>/etc/resolv.conf
 echo "nameserver 8.8.4.4" >>/etc/resolv.conf
+adduser dev
+adduser prod
 #
 
 # 0.4 全局安装基本组件
 sudo dnf install -y git createrepo curl expect openssl-devel libevent-devel libxml2-devel jansson-devel gcc gcc-c++ kernel-devel m4 make ncurses-devel openssl-devel SDL telnet-server telnet tcl tcl-devel unixODBC unixODBC-devel vim yum-utils
 # pygpgme tclx wxBase wxGTK wxGTK-gl
 
-# 安装 config-manager 插件
-sudo yum install -y dnf-plugins-core
+# 安装 config-manager 插件 和 中文字符集
+sudo yum install -y dnf-plugins-core glibc-common langpacks-zh_CN
+sudo sed -i.bak -e "s/en_US/zh_CN/"  /etc/locale.conf
+source /etc/locale.conf
 sudo dnf config-manager --set-enabled powertools
 echo "验证是否已成功启用PowerTools" >> ./init.log
 echo `dnf repolist` >> ./init.log
@@ -252,7 +256,7 @@ sudo yum-config-manager --enable nginx-mainline
 sudo dnf install -y nginx-1.17.1
 cp -rf /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak
 svrRoot="/"$dfDirName"/html/www;"
-sed -i "s#/usr/share/nginx/html;#$svrRoot#" /etc/nginx/conf.d/default.conf
+sed -i.bak -e "s#/usr/share/nginx/html;#$svrRoot#" /etc/nginx/conf.d/default.conf
 
 echo '启动Nginx服务'
 echo 'Start the Nginx service'
@@ -273,8 +277,8 @@ tipOpt ${steps[$stepCt]}
 sudo dnf install -y @mysql
 
 cp /etc/my.cnf /etc/my.cnf.back
-sed -i "s#datadir=/.*#datadir=/$dfDirName/db_data/mysql#" /etc/my.cnf
-sed -i "s#socket=/.*#socket=/$dfDirName/db_data/mysql/mysql.sock#" /etc/my.cnf
+sed -i -e "s#datadir=/.*#datadir=/$dfDirName/db_data/mysql#" /etc/my.cnf
+sed -i -e "s#socket=/.*#socket=/$dfDirName/db_data/mysql/mysql.sock#" /etc/my.cnf
 
 echo -e "\n\
 [client]\n\
@@ -431,7 +435,13 @@ rpm -qa | grep mysql
 rpm -qa | grep postgresql
 tipOpt "node 版本重启后，node -v 查看"
 tipOpt "npm 版本重启后，npm -v 查看"
+
+echo ""
+echo ""
 getLine
+tipGreen 字符集
+locale
+
 # 输出 SMPOO_LOGO
 tipFinish
 echo ""

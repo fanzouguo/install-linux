@@ -5,10 +5,10 @@ set dbPwdRoot "Smpoo@2015"
 set dbPwdDev "Dev@2015"
 set dbPwdProd "SmpooProd@2021"
 # set tblName "mysql"
+# 清除 root 密码并授权远程登录
+set strClearRootPwd "UPDATE mysql.user SET host='%', authentication_string='' WHERE user='root';\r"
 # 修改 root 密码
-set strChangeRootPwd "ALTER user 'root'@'localhost' IDENTIFIED BY '$dbPwdRoot';\r"
-# 授权 root 远程登录
-set strClearRootPwd "UPDATE mysql.user SET host='%' WHERE user='root';\r"
+set strChangeRootPwd "ALTER user 'root'@'%' IDENTIFIED BY '$dbPwdRoot';\r"
 # 创建 DEV 用户
 set strUserDev "CREATE user 'dev'@'%' IDENTIFIED BY '$dbPwdDev';CREATE user 'prod'@'%' IDENTIFIED BY '$dbPwdProd';\r"
 # 创建 prod 用户
@@ -21,6 +21,16 @@ set strGrantRoot "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;FL
 # set strGrantProd "GRANT ALL PRIVILEGES ON $tblName.* TO 'prod'@'%';FLUSH PRIVILEGES;\r"
 set strEnd "SELECT host,user,authentication_string FROM mysql.user;\r"
 
+# TODO: 修改 系统（非DB）的 dev 和 prod 密码
+# passwd dbuser
+# TODO: 切换到 postgres 账号下执行 postgresql相关的授权指令
+# su postgres
+
+# TODO:  执行完成后，等待用户输入 root 密码后，切换回 root 账号
+# su root
+
+# TODO: 继续显示 安装报告
+
 spawn mysql -uroot -h 127.0.0.1 -p
 expect {
 "password:" {send "\r"};
@@ -29,10 +39,10 @@ expect {
 "mysql>" {send "USE mysql;\r"};
 }
 expect {
-"mysql>" {send $strChangeRootPwd};
+"mysql>" {send $strClearRootPwd};
 }
 expect {
-"mysql>" {send $strClearRootPwd};
+"mysql>" {send $strChangeRootPwd};
 }
 expect {
 "mysql>" {send $strUserDev};
@@ -54,29 +64,5 @@ expect {
 }
 expect {
 "mysql>" {send "quit\r"};
-}
-interact
-
-
-set strChangePwdRoot "ALTER USER postgres WITH PASSWORD '$dbPwdRoot';\r"
-set strRootUser "CREATE USER root WITH PASSWORD '$dbPwdDev';\r"
-set strDevUser "CREATE USER dev WITH PASSWORD '$dbPwdDev';\r"
-set strProdUser "CREATE USER prod WITH PASSWORD '$dbPwdProd';\r"
-
-spawn psql -U postgres
-expect {
-"postgres=#" {send $strChangePwdRoot};
-}
-expect {
-"postgres=#" {send $strRootUser};
-}
-expect {
-"postgres=#" {send $strDevUser};
-}
-expect {
-"postgres=#" {send $strProdUser};
-}
-expect {
-"postgres=#" {send "\\q\r"};
 }
 interact

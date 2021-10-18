@@ -117,6 +117,9 @@ esac
 
 echo "执行安装...."
 cd /root
+# 创建安装日志文件
+touch init.log
+
 # 0.1 预下载SQL预处理脚本
 wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/lib/sql/initSql.sh
 chmod +x ./initSql.sh
@@ -164,8 +167,14 @@ echo "nameserver 8.8.8.8" >>/etc/resolv.conf
 #
 
 # 0.4 全局安装基本组件
-sudo dnf install -y git createrepo curl expect openssl-devel libevent-devel libxml2-devel jansson-devel epel-release gcc gcc-c++ kernel-devel m4 make ncurses-devel openssl-devel SDL telnet-server telnet tcl tcl-devel unixODBC unixODBC-devel vim yum-utils
+sudo dnf install -y git createrepo curl expect openssl-devel libevent-devel libxml2-devel jansson-devel gcc gcc-c++ kernel-devel m4 make ncurses-devel openssl-devel SDL telnet-server telnet tcl tcl-devel unixODBC unixODBC-devel vim yum-utils
 # pygpgme tclx wxBase wxGTK wxGTK-gl
+
+# 安装 config-manager 插件
+sudo yum install -y dnf-plugins-core
+sudo dnf config-manager --set-enabled powertools
+echo "验证是否已成功启用PowerTools" >> ./init.log
+echo `dnf repolist` >> ./init.log
 #
 
 # 步骤列表

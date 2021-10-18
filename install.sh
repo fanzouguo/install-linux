@@ -164,6 +164,7 @@ systemctl start firewalld.service
 # 0.3 为系统添加DNS,以避免 类似mongoDB的国外源更新失败
 # 备用全局 Linux 资源地址
 echo "nameserver 8.8.8.8" >>/etc/resolv.conf
+echo "nameserver 8.8.4.4" >>/etc/resolv.conf
 #
 
 # 0.4 全局安装基本组件

@@ -121,7 +121,7 @@ cd /root
 touch init.log
 
 # 0.1 预下载SQL预处理脚本
-wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/lib/sql/initSql.sh
+wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/lib/db/initDb.sh
 chmod +x ./initSql.sh
 
 # 0.1 更改系统源为 163 源

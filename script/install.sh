@@ -5,6 +5,10 @@
 ROOT_PATH="smpoo_file"
 # 本次安装所基于的项目名称
 PROJECT_NAME="tcoffe"
+if [ "$1" != "" ];
+then
+  PROJECT_NAME=$1
+fi
 # 基于本次安装的全局数据盘根路径（如果存在的话）
 ROOT_DATA_PATH="smpoo_disk"
 # 步骤计数器

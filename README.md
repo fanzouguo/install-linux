@@ -9,6 +9,13 @@ tFrame工程脚本集合
 sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/script/install.sh -O -)"
 ```
 
+> #### 获取执行命令时，可以传入项目名称
+```shell
+wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/script/install.sh | sh [项目名称]
+# OR
+wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@仓库最新版本号/script/install.sh | sh [项目名称]
+```
+
 ```shell
 curl https://raw.githubusercontent.com/fanzouguo/install-linux/main/script/install.sh | bash
 ```

@@ -24,12 +24,12 @@ wget -qO- https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/script/instal
 
 > #### 或者
 ```shell
-git clone git@github.com:fanzouguo/install-linux.git ~/initSvr
+git clone git@github.com:fanzouguo/script/install-linux.git ~/initSvr
 ```
 
 > #### 若因版本缓存问题导致下载到了旧版，可改用
 ```shell
-curl -o-  https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@仓库最新版本号/install.sh | bash
+curl -o-  https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@仓库最新版本号/script/install.sh | bash
 ```
 
 ## 注意

@@ -4,6 +4,11 @@ tFrame工程脚本集合
 ## 用例
 
 ### 初始化 Linux 服务器
+> #### 推荐：(避免防火墙干扰，下载即安装)
+```shell
+sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/script/install.sh -O -)"
+```
+
 ```shell
 curl https://raw.githubusercontent.com/fanzouguo/install-linux/main/script/install.sh | bash
 ```

@@ -1,4 +1,3 @@
-const { tEcho, tClear, smpoo, tDate } = require('tmind-core');
 const fs = require('fs-extra');
 const path = require('path');
 const inquirer = require('inquirer');
@@ -6,6 +5,23 @@ const shelljs = require('shelljs');
 const { series } = require('gulp');
 
 const _devBase = process.cwd();
+
+const tEcho = (msg, title = '', type = 'INFO') => {
+	if (type === 'ERR') {
+		console.error(msg);
+	} else if (type === 'INFO') {
+		console.log(msg);
+	} else if (type === 'WARN') {
+		console.warn(msg);
+	} else {
+		console.log(msg);
+	}
+};
+
+const tClear = () => {
+	console.clear();
+};
+
 const VER_POLICY = {
 	major: 0,
 	minor: 1,
@@ -232,6 +248,7 @@ const STEP_4_UpPkg = async cb => {
 // 5、提交 git Hub
 const STEP_5_SaveToGit = async cb => {
 	echo.tRow('', '提交GitHub...');
+	// @ts-ignore
 	BUILD_OPT.CMD_GIT.push('git add .');
 	const regRule = new RegExp('^[a-zA-Z]');
 	let memoStr = SETP_VAL['#002'];
@@ -242,7 +259,8 @@ const STEP_5_SaveToGit = async cb => {
 	if (_tagThis_) {
 		BUILD_OPT.CMD_GIT.push(`git tag -a v${BUILD_OPT.CURR_PKG.version} -m "${memoStr}"`);
 	}
-	BUILD_OPT.CMD_GIT.push(`git commit -m "(${tDate().format('YYYY-MM-DD hh:mi:ss')})${memoStr}"`);
+	const dtStr = (new Date()).toLocaleDateString();
+	BUILD_OPT.CMD_GIT.push(`git commit -m "(${dtStr})${memoStr}"`);
 	if (_tagThis_) {
 		BUILD_OPT.CMD_GIT.push('git push origin --tags');
 	}
@@ -264,9 +282,6 @@ const STEP_5_SaveToGit = async cb => {
 
 // 完成
 const STEP_Done = cb => {
-	const { consoleStr } = smpoo();
-	// @ts-ignore
-	tEcho(consoleStr());
 	tEcho('\n');
 	echo.tLine(`  ${BUILD_OPT.NAME_APP} 构建完成  `);
 	tEcho(`${BUILD_OPT.CURR_PKG.description || '无描述'}\n`);

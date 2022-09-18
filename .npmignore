@@ -1,0 +1,13 @@
+node_modules
+src
+test
+*.lock
+*.log
+.*
+.*.js
+*.config.js
+*.json
+old
+doc
+conf
+*/**/.sysconf

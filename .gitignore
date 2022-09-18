@@ -1,0 +1,7 @@
+.pnpm-store
+.pnpm-*
+node_modules
+dist
+*.log
+conf
+*/**/.sysconf

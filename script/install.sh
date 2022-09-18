@@ -167,44 +167,46 @@ function prepareSysParam() {
 function preparePath() {
 	mkdir -p /root/.ssh
 	PROJECT_ROOT="/$ROOT_PATH/$PROJECT_NAME"
-	# 公共环境路径
+	# 公共环境路径（所有类型管理员均具有读写权限，仅 root 具有删除权限）
 	mkdir -p -m 777 "/$ROOT_PATH/common/.env"
-	# 网页备份文件存放路径
-	mkdir -p -m 777 "/$PROJECT_ROOT/backup/www"
-	# 数据库备份文件存放路径
-	mkdir -p -m 777 "/$PROJECT_ROOT/backup/db"
-	# SSL 证书存放路径
-	mkdir -p -m 777 "/$PROJECT_ROOT/data/cert"
-	# 程序运行时上传文件的存放路径
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/data/uploadFiles"
-	# 数据库的库文件路径
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/data/db/mysql"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/data/db/mongo"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/data/db/redis"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/data/db/postgres"
-	# nginx 日志文件路径
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/db/nginx"
-	# mysql 数据库日志文件路径
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/db/mysql"
-	# mongoDb 数据库日志文件路径
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/db/mongo"
-	# redis 数据库日志文件路径
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/db/redis"
-	# postgreSql 数据库日志文件路径
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/db/postgres"
-	# 后端服务运行时日志文件路径
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/admin"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/authSvr"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/biz"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/file"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/io"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/mail"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/logs/sms"
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/project/nodejs"
-	# Docker 镜像文件仓库
-	mkdir -p -m 777 "/$PROJECT_ROOT/repo/docker"
-	# 网页 web 服务文件根地址
-	mkdir -p -m 777 "/"$PROJECT_ROOT"/html/www"
+	# SSL 证书存放路径（所有类型管理员均具有读写权限，仅 root 具有删除权限）
+	mkdir -p -m 777 "/$ROOT_PATH/common/.env/cert"
+	# 数据库的库文件路径（仅DB管理员有读写权限，但不具备删除权限，仅 root 具有删除权限）
+	mkdir -p -m 777 "/$ROOT_PATH/common/.db/mysql"
+	mkdir -p -m 777 "/$ROOT_PATH/common/.db/mongo"
+	mkdir -p -m 777 "/$ROOT_PATH/common/.db/redis"
+	mkdir -p -m 777 "/$ROOT_PATH/common/.db/postgres"
+	# Docker 镜像文件仓库（所有管理员类型账号均有权限）
+	mkdir -p -m 777 "/$ROOT_PATH/common/repo/docker"
+	# 网页备份文件存放路径（仅备份管理员具有读写权限，但不具备删除权限，仅 root 具有删除权限）
+	mkdir -p -m 777 "/$ROOT_PATH/backup/www/$PROJECT_NAME"
+	# 数据库备份文件存放路径（仅备份管理员具有读写权限，但不具备删除权限，仅 root 具有删除权限）
+	mkdir -p -m 777 "/$ROOT_PATH/backup/db/$PROJECT_NAME"
+	# 程序运行时上传文件的存放路径（仅 root 和开发、运维具有权限）
+	mkdir -p -m 777 "/$PROJECT_NAME/data/uploadFiles"
+	# 基于项目的文档根地址（仅 root 和开发、运维具有权限）
+	mkdir -p -m 777 "/$PROJECT_NAME/doc"
+	# nginx 日志文件路径（仅 root 和开发、运维具有权限）
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/db/nginx"
+	# mysql 数据库日志文件路径（仅 root 和开发、运维具有权限）
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/db/mysql"
+	# mongoDb 数据库日志文件路径（仅 root 和开发、运维具有权限）
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/db/mongo"
+	# redis 数据库日志文件路径（仅 root 和开发、运维具有权限）
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/db/redis"
+	# postgreSql 数据库日志文件路径（仅 root 和开发、运维具有权限）
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/db/postgres"
+	# 后端服务运行时日志文件路径（仅 root 和开发、运维具有权限）
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/admin"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/authSvr"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/biz"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/file"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/io"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/mail"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/sms"
+	mkdir -p -m 777 "/$PROJECT_ROOT/project/nodejs"
+	# 网页 web 服务文件根地址（仅 root 和开发、运维具有权限）
+	mkdir -p -m 777 "/$PROJECT_ROOT/html/www"
 	# 为系统添加 prod 和 dev 用户
 	adduser dev
 	adduser prod

@@ -233,6 +233,7 @@ function installDocker() {
 	echo "}" >> /etc/docker/daemon.json
 	systemctl start docker.socket
 	systemctl start docker
+	docker -v
 }
 # 环境清理
 function cleanEnv() {

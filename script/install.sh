@@ -177,7 +177,7 @@ function preparePath() {
 	mkdir -p -m 777 "/$ROOT_PATH/common/.db/redis"
 	mkdir -p -m 777 "/$ROOT_PATH/common/.db/postgres"
 	# Docker 镜像文件仓库（所有管理员类型账号均有权限）
-	mkdir -p -m 777 "/$ROOT_PATH/common/repo/docker"
+	mkdir -p -m 777 "/$ROOT_PATH/common/.docker/image"
 	# 网页备份文件存放路径（仅备份管理员具有读写权限，但不具备删除权限，仅 root 具有删除权限）
 	mkdir -p -m 777 "/$ROOT_PATH/backup/www/$PROJECT_NAME"
 	# 数据库备份文件存放路径（仅备份管理员具有读写权限，但不具备删除权限，仅 root 具有删除权限）
@@ -223,6 +223,15 @@ function installDocker() {
 	yum install -y docker-ce
 	systemctl start docker
 	systemctl enable docker
+	systemctl stop docker.socket
+	systemctl stop docker
+	# 修改镜像存储位置
+	touch /etc/docker/daemon.json
+	echo "{" >> /etc/docker/daemon.json
+	echo "\"data-root\": \"/smpoo_file/common/.docker/image\"" >> /etc/docker/daemon.json
+	echo "}" >> /etc/docker/daemon.json
+	systemctl start docker.socket
+	systemctl start docker
 }
 # 环境清理
 function cleanEnv() {

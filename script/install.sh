@@ -29,7 +29,8 @@ ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk 
 # MongoDb 数据库接口 27017 28017
 # SVN 接口 3690
 # NodeJs 项目远程调试端口 9229
-ALLOW_PORT=(80 443 3306 27017 28017 3690 9229 3000 3001 3002 3003 3004 3005 3006 3007 3008 3999 4000 4001 4002 4003 4999 5100 5101 5102 5103 5999 8080 9999)
+# Cockpit WEB 端管理页面端口 9090
+ALLOW_PORT=(80 443 3306 27017 28017 3690 9229 3000 3001 3002 3003 3004 3005 3006 3007 3008 3999 4000 4001 4002 4003 4999 5100 5101 5102 5103 5999 8080 9090 9999)
 # endregion
 
 # region 全局函数库
@@ -171,6 +172,7 @@ function prepareSysParam() {
 # 预准备项目文件夹和用户
 function preparePath() {
 	mkdir -p /root/.ssh
+	# mkdir -pv kkkk/{bbbb/{yyyy,mmmm},cccc/{eeeee,ffff}}
 	PROJECT_ROOT="/$ROOT_PATH/$PROJECT_NAME"
 	# 公共环境路径（所有类型管理员均具有读写权限，仅 root 具有删除权限）
 	mkdir -p -m 777 "/$ROOT_PATH/common/.env"
@@ -192,7 +194,7 @@ function preparePath() {
 	# 基于项目的文档根地址（仅 root 和开发、运维具有权限）
 	mkdir -p -m 777 "/$PROJECT_NAME/doc"
 	# nginx 日志文件路径（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$PROJECT_ROOT/logs/db/nginx"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/nginx"
 	# mysql 数据库日志文件路径（仅 root 和开发、运维具有权限）
 	mkdir -p -m 777 "/$PROJECT_ROOT/logs/db/mysql"
 	# mongoDb 数据库日志文件路径（仅 root 和开发、运维具有权限）
@@ -202,13 +204,14 @@ function preparePath() {
 	# postgreSql 数据库日志文件路径（仅 root 和开发、运维具有权限）
 	mkdir -p -m 777 "/$PROJECT_ROOT/logs/db/postgres"
 	# 后端服务运行时日志文件路径（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$PROJECT_ROOT/logs/admin"
-	mkdir -p -m 777 "/$PROJECT_ROOT/logs/authSvr"
-	mkdir -p -m 777 "/$PROJECT_ROOT/logs/biz"
-	mkdir -p -m 777 "/$PROJECT_ROOT/logs/file"
-	mkdir -p -m 777 "/$PROJECT_ROOT/logs/io"
-	mkdir -p -m 777 "/$PROJECT_ROOT/logs/mail"
-	mkdir -p -m 777 "/$PROJECT_ROOT/logs/sms"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/adminSvr"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/authSvr"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/bizSvr"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/fileSvr"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/ioSvr"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/mailSvr"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/smsSvr"
+	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/mockSvr"
 	mkdir -p -m 777 "/$PROJECT_ROOT/project/nodejs"
 	# 网页 web 服务文件根地址（仅 root 和开发、运维具有权限）
 	mkdir -p -m 777 "/$PROJECT_ROOT/html/www"
@@ -238,6 +241,13 @@ function installDocker() {
 	systemctl start docker.socket
 	systemctl start docker
 	docker -v
+}
+# 安装 cockpit
+function installCockpit() {
+	yum install -y cockpit cockpit-docker cockpit-machines cockpit-dashboard cockpit-storaged cockpit-packagekit
+	systemctl enable --now cockpit
+	firewall-cmd --permanent --zone=public --add-service=cockpit
+	firewall-cmd --reload
 }
 # 环境清理
 function cleanEnv() {
@@ -297,5 +307,7 @@ preparePath
 openPort
 # 0.4 安装 Docker
 installDocker
+# 0.5 安装 Cockpit
+installCockpit
 # 0.9 显示安装报告
 echoReport

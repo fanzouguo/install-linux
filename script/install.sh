@@ -138,7 +138,7 @@ function changeSource() {
 	# wget http://mirrors.163.com/.help/CentOS7-Base-163.repo
 	# 阿里源
 	# wget -O /etc/yum.repos.d/CentOS-Base-epel.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-	# 中科大源
+	# 科大源
 	wget -O /etc/yum.repos.d/CentOS-Base-epel.repo http://mirrors.yangxingzhen.com/help/CentOS7-Base-zju.repo
 	yum clean all
 	rm -rf /var/cache/yum
@@ -148,11 +148,20 @@ function changeSource() {
 
 	# 更改 EPEL
 	yum install -y epel-release
-	sudo sed -i.bak \
-	-e 's|^metalink|#metalink|' \
-	-e 's|^#baseurl=|baseurl=|' \
-	-e 's|download.fedoraproject.org/pub|mirrors.aliyun.com|' \
-	/etc/yum.repos.d/epel*.repo
+	# 切换为阿里云
+	# sudo sed -i.bak \
+	# -e 's|^metalink|#metalink|' \
+	# -e 's|^#baseurl=|baseurl=|' \
+	# -e 's|download.fedoraproject.org/pub|mirrors.aliyun.com|' \
+	# /etc/yum.repos.d/epel*.repo
+
+	# 切换为科大源
+	sudo sed -e 's|^metalink=|#metalink=|g' \
+	-e 's|^#baseurl=https\?://download.fedoraproject.org/pub/epel/|baseurl=https://mirrors.ustc.edu.cn/epel/|g' \
+	-e 's|^#baseurl=https\?://download.example/pub/epel/|baseurl=https://mirrors.ustc.edu.cn/epel/|g' \
+	-i.bak \
+	/etc/yum.repos.d/epel.repo
+
 	yum -y makecache
 	yum -y update
 }
@@ -233,8 +242,13 @@ function installDocker() {
 	# 卸载可能已安装过的旧版Docker(如果存在的话)
 	yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine docker-ce
 	# 设置 Docker 仓库
+	# 官方仓库
 	# yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-	yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+	# 阿里云仓库
+	# yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+	# 科大仓库
+	yum-config-manager --add-repo https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
+
 	yum -y makecache fast
 	# 开始安装
 	yum install -y docker-ce

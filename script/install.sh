@@ -45,7 +45,6 @@ function openPort() {
 	for subItem in ${ALLOW_PORT[*]}; do
 		if [ $subItem -gt 0 ]; then
 			echo "Port：$subItem"
-			# firewall-cmd --zone=public "--add-port=$subItem/tcp" --permanent
 			firewall-cmd --zone=public --permanent --add-port=$subItem/tcp
 			# 防火墙重新加载，以便生效之前的放行
 			firewall-cmd --reload
@@ -194,6 +193,8 @@ function preparePath() {
 	mkdir -p -m 777 "/$ROOT_PATH/common/.env/nginx/cert"
 	# SSL 自签名代理验证路径
 	mkdir -p -m 777 "/$ROOT_PATH/common/.env/nginx/_letsencrypt"
+	# NINGX 配置存放路径
+	mkdir -p -m 777 "/$ROOT_PATH/common/.env/nginx/conf"
 	# 数据库的库文件路径（仅DB管理员有读写权限，但不具备删除权限，仅 root 具有删除权限）
 	mkdir -p -m 777 "/$ROOT_PATH/common/.db/mysql"
 	mkdir -p -m 777 "/$ROOT_PATH/common/.db/mongo"
@@ -231,6 +232,8 @@ function preparePath() {
 	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/mockSvr"
 	# 项目文件夹
 	mkdir -p -m 777 "/$PROJECT_ROOT/project/nodejs"
+	# 基于本次项目的 dockerFile 文件夹
+	mkdir -p -m 777 "/$PROJECT_ROOT/dockerFile"
 	# 网页 web 服务文件根地址（仅 root 和开发、运维具有权限）
 	mkdir -p -m 777 "/$PROJECT_ROOT/html/www"
 	# 为系统添加 prod 和 dev 用户

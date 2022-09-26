@@ -134,8 +134,12 @@ function changeSource() {
 	# 更换主源文件
 	cd /etc/yum.repos.d/
 	mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bk
+	# 163 源
 	# wget http://mirrors.163.com/.help/CentOS7-Base-163.repo
-	wget -O /etc/yum.repos.d/CentOS-Base-epel.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+	# 阿里源
+	# wget -O /etc/yum.repos.d/CentOS-Base-epel.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+	# 中科大源
+	wget -O /etc/yum.repos.d/CentOS-Base-epel.repo http://mirrors.yangxingzhen.com/help/CentOS7-Base-zju.repo
 	yum clean all
 	rm -rf /var/cache/yum
 	mv CentOS7-Base-163.repo CentOS-Base.repo

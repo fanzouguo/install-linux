@@ -100,6 +100,7 @@ function tipFinish() {
 	echo ""
 	echo  -e "\033[34m                        上海深普软件有限公司 - www.smpoo.com \033[0m"
 }
+# 获取控制台屏显宽度
 function getshellwidth() {
   echo `stty size|awk '{print $2}'`
   # return 0 # return是返回 成功或者失败的
@@ -177,7 +178,9 @@ function preparePath() {
 	# 公共环境路径（所有类型管理员均具有读写权限，仅 root 具有删除权限）
 	mkdir -p -m 777 "/$ROOT_PATH/common/.env"
 	# SSL 证书存放路径（所有类型管理员均具有读写权限，仅 root 具有删除权限）
-	mkdir -p -m 777 "/$ROOT_PATH/common/.env/cert"
+	mkdir -p -m 777 "/$ROOT_PATH/common/.env/nginx/cert"
+	# SSL 自签名代理验证路径
+	mkdir -p -m 777 "/$ROOT_PATH/common/.env/nginx/_letsencrypt"
 	# 数据库的库文件路径（仅DB管理员有读写权限，但不具备删除权限，仅 root 具有删除权限）
 	mkdir -p -m 777 "/$ROOT_PATH/common/.db/mysql"
 	mkdir -p -m 777 "/$ROOT_PATH/common/.db/mongo"
@@ -189,8 +192,9 @@ function preparePath() {
 	mkdir -p -m 777 "/$ROOT_PATH/backup/www/$PROJECT_NAME"
 	# 数据库备份文件存放路径（仅备份管理员具有读写权限，但不具备删除权限，仅 root 具有删除权限）
 	mkdir -p -m 777 "/$ROOT_PATH/backup/db/$PROJECT_NAME"
-	# 程序运行时上传文件的存放路径（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$PROJECT_NAME/data/uploadFiles"
+	# [uploadFiles]：程序运行时上传文件的存放路径（仅 root 和开发、运维具有权限）
+	# [uploadFiles/.smpoo]：默认的 logo\favicon.ico\50x.html 等文件缓存
+	mkdir -p -m 777 "/$PROJECT_NAME/data/uploadFiles/.smpoo"
 	# 基于项目的文档根地址（仅 root 和开发、运维具有权限）
 	mkdir -p -m 777 "/$PROJECT_NAME/doc"
 	# nginx 日志文件路径（仅 root 和开发、运维具有权限）
@@ -212,6 +216,7 @@ function preparePath() {
 	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/mailSvr"
 	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/smsSvr"
 	mkdir -p -m 777 "/$PROJECT_ROOT/logs/project/mockSvr"
+	# 项目文件夹
 	mkdir -p -m 777 "/$PROJECT_ROOT/project/nodejs"
 	# 网页 web 服务文件根地址（仅 root 和开发、运维具有权限）
 	mkdir -p -m 777 "/$PROJECT_ROOT/html/www"

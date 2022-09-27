@@ -212,6 +212,8 @@ function preparePath() {
 	mkdir -p -m 777 "/$ROOT_PATH/backup/www/$PROJECT_NAME"
 	# 数据库备份文件存放路径（仅备份管理员具有读写权限，但不具备删除权限，仅 root 具有删除权限）
 	mkdir -p -m 777 "/$ROOT_PATH/backup/db/$PROJECT_NAME"
+	# 客户项目的 github 本地库
+	mkdir -p -m 777 "/$ROOT_PATH/backup/git/$PROJECT_NAME"
 	# nginx 日志文件路径（仅 root 和开发、运维具有权限）
 	mkdir -p -m 777 "/$ROOT_PATH/logs/nginx"
 	# mysql 数据库日志文件路径（仅 root 和开发、运维具有权限）

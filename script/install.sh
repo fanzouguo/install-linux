@@ -5,10 +5,6 @@
 ROOT_PATH="smpoo_file"
 # 本次安装所基于的项目名称
 PROJECT_CODE="tcoffe"
-if [ "$1" != "" ];
-then
-  PROJECT_CODE=$1
-fi
 # 基于本次安装的全局数据盘根路径（如果存在的话）
 ROOT_DATA_PATH="smpoo_disk"
 # 步骤计数器
@@ -219,7 +215,7 @@ function installDocker() {
 	# 修改镜像存储位置
 	touch /etc/docker/daemon.json
 	echo "{" >> /etc/docker/daemon.json
-	echo "\"data-root\": \"/smpoo_file/.env/docker/image\"" >> /etc/docker/daemon.json
+	echo "\"data-root\": \"/smpoo_file/.env/docker/images\"" >> /etc/docker/daemon.json
 	echo "}" >> /etc/docker/daemon.json
 	systemctl start docker.socket
 	systemctl start docker
@@ -237,8 +233,6 @@ function cleanEnv() {
 	tipGreen "环境清理"
 	yum clean all
 	yum -y autoremove
-	# 根文件夹授权
-	chmod -R 777 "/"$ROOT_PATH
 }
 # 显示安装报告
 function echoReport() {
@@ -294,3 +288,5 @@ installDocker
 installCockpit
 # 0.9 显示安装报告
 echoReport
+
+echo "Done!"

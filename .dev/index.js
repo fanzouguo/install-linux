@@ -1,307 +1,71 @@
 const fs = require('fs-extra');
 const path = require('path');
-const inquirer = require('inquirer');
 const shelljs = require('shelljs');
-const { series } = require('gulp');
+const readline = require('readline');
 
-const _devBase = process.cwd();
-
-const tEcho = (msg, title = '', type = 'INFO') => {
-	if (type === 'ERR') {
-		console.error(msg);
-	} else if (type === 'INFO') {
-		console.log(msg);
-	} else if (type === 'WARN') {
-		console.warn(msg);
-	} else {
-		console.log(msg);
-	}
-};
-
-const tClear = () => {
-	console.clear();
-};
-
-const VER_POLICY = {
-	major: 0,
-	minor: 1,
-	build: 2
-};
-// 发布备选问题
-const SETP_QUESTION = {
-	// 1、版本策略
-	'#001': {
-		name: 'VER_POLICY',
-		type: 'list',
-		message: '请选择版本更新策略',
-		default: 'build',
-		choices: [
-			'major',
-			'minor',
-			'build'
-		]
-	},
-	// 2、输入提交备注
-	'#002': {
-		type: 'input',
-		message: '请输入提交备注',
-		name: 'GIT_MEMO'
-	},
-	// 2、输入GIT分支
-	'#003': {
-		type: 'input',
-		message: '请输入GIT分支',
-		name: 'GIT_BRANCH',
-		default: 'main'
-	},
-	// 3、是否创建 tag 标签
-	'#004': {
-		type: 'confirm',
-		message: '是否根据该版本创建 tag 标签',
-		name: 'TAG_THIS',
-		default: false
-	}
-};
-// 各步骤值记录
-const SETP_VAL = {
-	// 版本策略
-	'#001': 'build',
-	// 本次提交备注
-	'#002': '',
-	// git分支
-	'#003': 'main',
-	// 是否创建 tag 标签
-	'#004': false
-};
-
-const BUILD_OPT = {
-	// 本次构建的程序名称
-	NAME_APP: '',
-	// package.json 文件名
-	NAME_FILE_PKG: 'package.json',
-	// 构建前的版本号
-	VER_BEFORE: '',
-	// 当前构建项目的 package.json
-	CURR_PKG: {},
-	// 本次构建要执行的 github 指令集
-	CMD_GIT: [],
-	/** .dev/conf环境是否需要重新初始化
-	 *
-	 */
-	NEED_EVN: false,
-	/** 发布后，回装模式
-	 *
-	 */
-	YARN_TYPE: 'yarn add',
-	/** 是否允许上传到 npmjs
-	 *
-	 */
-	ALLOW_PUBLISH: false
-};
-
-// 显示控制
-const echo = {
-	// 行分割线显示
-	tLine: str => {
-		const _str = str ? `${str}` : '';
-		tEcho(`\n--------------------------------------${_str}--------------------------------------\n`);
-	},
-	// 行信息显示
-	tRow: (msg, title, type = 'INFO') => {
-		tEcho('\n');
-		// @ts-ignore
-		tEcho(msg, title || '', type);
-	},
-	// 路径格式化器
-	pathFormatter: (str) => str.replace(/\\\\|\\/g, '/'),
-	/** 终止器
-	 * @param {*} msg 退出前的提示信息
-	 * @param {*} title 控制台显示时的标签
-	 * @param {*} code 进程退出码
-	 */
-	terminate: (msg, title = '', code = 1) => {
-		tEcho(msg || '', title || '', 'ERR');
-		process.exit(code);
-	}
-};
-/** 发起交互提问
- *
- * @param {*} code 问题码
- */
-const qsExecer = async code => {
-	try {
-		const _obj = SETP_QUESTION[code];
-		if (_obj) {
-			const { depend, ...otherDef } = _obj;
-			if (!depend || (depend && depend())) {
-				const res = await inquirer.prompt(otherDef);
-				SETP_VAL[code] = res[_obj.name];
-			}
-		} else {
-			return '#done';
-		}
-	} catch (err) {
-		echo.terminate(err.message);
-	}
-};
-
-function* questions(needEnv) {
-	if (needEnv) {
-		yield qsExecer('EVT');
-		BUILD_OPT.NEED_EVN = false;
-	}
-	const val = Object.keys(SETP_QUESTION).length + 1;
-	for (let i = 0; i < val; i++) {
-		yield qsExecer(`#00${i}`);
-	}
-}
-
-/** 异步写入文件
- *
- * @param fName 含文件名的路径
- * @param fData 要写入文件的数据
- * @returns
- */
-const writeFile = async (fName, fData) => {
+// ask question from input
+const getAnswer = question => {
 	return new Promise((resolve, reject) => {
-		fs.writeFile(fName, fData, err => {
-			if (err) reject(err);
-			resolve('');
+		const rl = readline.createInterface({
+			input: process.stdin,
+			output: process.stdout
+		});
+		rl.question(question, answer => {
+			rl.close();
+			resolve(answer);
 		});
 	});
 };
 
-class PathMgr {
-	constructor() { }
-
-	/** 获取路径
-	 *
-	 * @param basePath 根路径，如果为空字符或 nullLike 则代表 process.cwd
-	 * @param suffix 子路径
-	 * @returns
-	 */
-	static getPath(basePath, ...suffix) {
-		return echo.pathFormatter(path.resolve((basePath || process.cwd()), ...suffix));
-	}
-
-	/** 读取指定根路径下的 JSON 文件
-	 *
-	 * @param basePath 根路径，如果为空字符或 nullLike 则代表 process.cwd
-	 * @param suffix 子路径
-	 * @returns
-	 */
-	static getJsonFile(basePath, ...suffix) {
-		return fs.readJSONSync(this.getPath(basePath, ...suffix));
-	}
-
-	/** 读取指定根路径下的 package.json 文件
-	 *
-	 * @param basePath 根路径，如果为空字符或 nullLike 则代表 process.cwd
-	 * @returns
-	 */
-	static getPackageJson(basePath) {
-		return this.getJsonFile(basePath, BUILD_OPT.NAME_FILE_PKG);
-	}
-}
-
-
-// 0、初始化工作区 NPM 仓库地址
-const STEP_0_REPO = async cb => {
-	// 获取当前构建程序的 package.json 配置
-	const _objPkg = PathMgr.getPackageJson();
-	BUILD_OPT.CURR_PKG = _objPkg;
-	BUILD_OPT.VER_BEFORE = _objPkg.version;
-	// 获取当前构建程序的程序名称
-	BUILD_OPT.NAME_APP = _objPkg.name;
-};
-
-// 0、环境和变量准备
-const STEP_1_Ask = async cb => {
-	tClear();
-	echo.tRow('', '初始化...');
-	const execer = questions(BUILD_OPT.NEED_EVN);
-	for (const v of execer) {
-		await v;
-	}
-	cb();
-};
-
-// 4、更新 package.json 版本号和依赖包版本
-const STEP_4_UpPkg = async cb => {
-	echo.tRow('', '重写版本号...');
-	const _offset_ = VER_POLICY[SETP_VAL['#001']];
-	const verArr = BUILD_OPT.VER_BEFORE.split('.').map(v => parseInt(v));
-	// @ts-ignore
-	const newVerArr = verArr.map((v, k) => {
-		if (k === _offset_) {
-			v++;
-		} else if (k > _offset_) {
-			v = 0;
-		}
-		return v;
+/** 更新版本号 */
+const setVer = async () => {
+	const pkgPath = path.resolve(process.cwd(), 'package.json');
+	const pkg = await fs.readJson(pkgPath, {
+		encoding: 'utf8'
 	});
-	// verArr[_offset_] = verArr[_offset_] + 1;
-	BUILD_OPT.CURR_PKG.version = newVerArr.join('.');
-	await writeFile(PathMgr.getPath('', BUILD_OPT.NAME_FILE_PKG), JSON.stringify(BUILD_OPT.CURR_PKG, null, 2));
-	cb();
-};
-// 5、提交 git Hub
-const STEP_5_SaveToGit = async cb => {
-	echo.tRow('', '提交GitHub...');
-	// @ts-ignore
-	BUILD_OPT.CMD_GIT.push('git add .');
-	const regRule = new RegExp('^[a-zA-Z]');
-	let memoStr = SETP_VAL['#002'];
-	if (regRule.test(memoStr)) {
-		memoStr = `${memoStr}`.upFirst();
-	}
-	const _tagThis_ = SETP_VAL['#004'];
-	if (_tagThis_) {
-		BUILD_OPT.CMD_GIT.push(`git tag -a v${BUILD_OPT.CURR_PKG.version} -m "${memoStr}"`);
-	}
-	const dtStr = (new Date()).toLocaleDateString();
-	BUILD_OPT.CMD_GIT.push(`git commit -m "(${dtStr})${memoStr}"`);
-	if (_tagThis_) {
-		BUILD_OPT.CMD_GIT.push('git push origin --tags');
-	}
+	console.log(`当前版本号：${pkg.version}`);
 
-	if (BUILD_OPT.CURR_PKG?.repository?.url) {
-		BUILD_OPT.CMD_GIT.push(`git push -u origin ${SETP_VAL['#003']}`);
+	const verPolice = await getAnswer('请选择版本策略：1) 更改主版本号 / 2) 子版本号 / 3 或回车) 修订号 -->');
+	const [a, b, c] = `${pkg.version}`.split('.').map(v => +v);
+	const _arr = [];
+	const answer = +verPolice;
+	if (answer === 1) {
+		_arr.push(a+1, 0, 0);
+	}	else if (answer === 2) {
+		_arr.push(a, b + 1, 0);
 	} else {
-		tEcho('本项目未关联 gitHub 仓库', '提示', 'WARN');
+		_arr.push(a, b, c + 1);
 	}
+	const newVer = _arr.join('.');
+	pkg.version = newVer;
+	await fs.writeJson(pkgPath, pkg, {
+		encoding: 'utf8',
+		spaces: 2
+	});
+	return newVer;
+};
 
-	for (const v of BUILD_OPT.CMD_GIT) {
-		// @ts-ignore
+// 5、提交 git Hub
+const execBuild = async () => {
+	console.clear();
+	console.log('准备提交GitHub...');
+	const currVer = await setVer();
+	const memoCommit = await getAnswer('请输入提交备注：');
+	const cmdStr = [
+		'git add .',
+		`git tag -a v${currVer} -m "${memoCommit}"`,
+		`git commit -m "${memoCommit}"`,
+		'git push origin --tags',
+		'git push -u origin main'
+	];
+
+	for (const v of cmdStr) {
 		shelljs.exec(v, {
 			async: false
 		});
 	}
-	cb();
+
+	console.log('Done!');
 };
 
-// 完成
-const STEP_Done = cb => {
-	tEcho('\n');
-	echo.tLine(`  ${BUILD_OPT.NAME_APP} 构建完成  `);
-	tEcho(`${BUILD_OPT.CURR_PKG.description || '无描述'}\n`);
-	tEcho('', `当前版本：v${BUILD_OPT.VER_BEFORE} —> v${BUILD_OPT.CURR_PKG.version}`, 'INFO');
-	echo.tLine('--------------------------');
-	tEcho('', '构建完成', 'SUCC');
-	const appName = BUILD_OPT.CURR_PKG.name;
-	// @ts-ignore
-	shelljs.exec(`yarn list ${appName}`);
-	process.exit();
-}
-
-const execBuild = () => {
-	return series(
-		STEP_0_REPO,
-		STEP_1_Ask,
-		STEP_4_UpPkg,
-		STEP_5_SaveToGit,
-		STEP_Done
-	);
-}
-
-execBuild()();
+execBuild();

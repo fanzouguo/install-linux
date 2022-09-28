@@ -184,7 +184,7 @@ function preparePath() {
 	cd /$ROOT_PATH
 	mkdir -pv -m 600 common/.smpoo
 	# .env
-	mkdir -pv -m 777 .env backup logs/nginx tcoffe
+	mkdir -pv -m 777 .env backup/tcoffe logs/nginx tcoffe
 	cd /$ROOT_PATH/.env
 	mkdir -pv -m 777 nginx db docker/images nodejs codeServer gitLab svn frp noVnc
 	cd /$ROOT_PATH/.env/nginx

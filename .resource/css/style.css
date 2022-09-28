@@ -1,0 +1,27 @@
+.p1 {
+	padding: 8px;
+}
+
+.p2 {
+	padding: 16px;
+}
+
+.textCenter {
+	text-align: center;
+}
+
+.projectCode {
+	padding: 0 4px;
+	color: #444;
+	background-color: orange;
+}
+
+table, thead, tbody, tr {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+tr > th,
+tr > td {
+	border: 1px #aaa solid;
+}

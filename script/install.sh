@@ -1,13 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 # region 全局变量
 # 基于本次安装的全局根路径
 ROOT_PATH="smpoo_file"
 # 本次安装所基于的项目名称
-PROJECT_NAME="tcoffe"
+PROJECT_CODE="tcoffe"
 if [ "$1" != "" ];
 then
-  PROJECT_NAME=$1
+  PROJECT_CODE=$1
 fi
 # 基于本次安装的全局数据盘根路径（如果存在的话）
 ROOT_DATA_PATH="smpoo_disk"
@@ -184,66 +184,15 @@ function prepareSysParam() {
 }
 # 预准备项目文件夹和用户
 function preparePath() {
-	mkdir -p /root/.ssh
-	# mkdir -pv kkkk/{bbbb/{yyyy,mmmm},cccc/{eeeee,ffff}}
-	PROJECT_ROOT="/$ROOT_PATH/$PROJECT_NAME"
-	# 公共环境路径（所有类型管理员均具有读写权限，仅 root 具有删除权限）
-	mkdir -p -m 777 "/$ROOT_PATH/.env"
-	# SSL 证书存放路径（所有类型管理员均具有读写权限，仅 root 具有删除权限），该文件对应于 nginx-docker 中的/smpoo_file/.env/nginx/cert
-	mkdir -p -m 777 "/$ROOT_PATH/.env/nginx/cert"
-	# SSL 自签名代理验证路径（对应于 certbot 自动证书验证地址，该文件需要映射到 .wellkown/_letsencrypt 下）
-	mkdir -p -m 777 "/$ROOT_PATH/.env/nginx/_letsencrypt"
-	# NINGX 配置存放路径（对应: /etc/nginx/conf.d）
-	mkdir -p -m 777 "/$ROOT_PATH/.env/nginx/conf"
-	# NodeJs 全局文件夹
-	mkdir -p -m 777 "/$ROOT_PATH/.env/nodejs/bin"
-	mkdir -p -m 777 "/$ROOT_PATH/.env/nodejs/cache"
-	mkdir -p -m 777 "/$ROOT_PATH/.env/nodejs/global"
-	mkdir -p -m 777 "/$ROOT_PATH/.env/nodejs/link"
-	mkdir -p -m 777 "/$ROOT_PATH/.env/nodejs/offline"
-	# 数据库的库文件路径（仅DB管理员有读写权限，但不具备删除权限，仅 root 具有删除权限）
-	mkdir -p -m 777 "/$ROOT_PATH/common/.db/mysql"
-	mkdir -p -m 777 "/$ROOT_PATH/common/.db/mongo"
-	mkdir -p -m 777 "/$ROOT_PATH/common/.db/redis"
-	mkdir -p -m 777 "/$ROOT_PATH/common/.db/postgres"
-	# Docker 镜像文件仓库（所有管理员类型账号均有权限）
-	mkdir -p -m 777 "/$ROOT_PATH/common/.docker/image"
-	# 网页备份文件存放路径（仅备份管理员具有读写权限，但不具备删除权限，仅 root 具有删除权限）
-	mkdir -p -m 777 "/$ROOT_PATH/backup/www/$PROJECT_NAME"
-	# 数据库备份文件存放路径（仅备份管理员具有读写权限，但不具备删除权限，仅 root 具有删除权限）
-	mkdir -p -m 777 "/$ROOT_PATH/backup/db/$PROJECT_NAME"
-	# 客户项目的 github 本地库
-	mkdir -p -m 777 "/$ROOT_PATH/backup/git/$PROJECT_NAME"
-	# nginx 日志文件路径（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$ROOT_PATH/logs/nginx"
-	# mysql 数据库日志文件路径（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$ROOT_PATH/logs/db/mysql"
-	# mongoDb 数据库日志文件路径（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$ROOT_PATH/logs/db/mongo"
-	# redis 数据库日志文件路径（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$ROOT_PATH/logs/db/redis"
-	# postgreSql 数据库日志文件路径（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$ROOT_PATH/logs/db/postgres"
-	# 后端服务运行时日志文件路径（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$ROOT_PATH/logs/$PROJECT_NAME/adminSvr"
-	mkdir -p -m 777 "/$ROOT_PATH/logs/$PROJECT_NAME/authSvr"
-	mkdir -p -m 777 "/$ROOT_PATH/logs/$PROJECT_NAME/bizSvr"
-	mkdir -p -m 777 "/$ROOT_PATH/logs/$PROJECT_NAME/fileSvr"
-	mkdir -p -m 777 "/$ROOT_PATH/logs/$PROJECT_NAME/ioSvr"
-	mkdir -p -m 777 "/$ROOT_PATH/logs/$PROJECT_NAME/mailSvr"
-	mkdir -p -m 777 "/$ROOT_PATH/logs/$PROJECT_NAME/smsSvr"
-	mkdir -p -m 777 "/$ROOT_PATH/logs/$PROJECT_NAME/mockSvr"
-	# [uploadFiles]：程序运行时上传文件的存放路径（仅 root 和开发、运维具有权限）
-	# [uploadFiles/.smpoo]：默认的 logo\favicon.ico\50x.html 等文件缓存
-	mkdir -p -m 600 "/$PROJECT_ROOT/data/uploadFiles/.smpoo"
-	# 基于项目的文档根地址（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$PROJECT_ROOT/data/doc"
-	# 项目文件夹
-	mkdir -p -m 777 "/$PROJECT_ROOT/project/nodejs"
-	# 基于本次项目的 dockerFile 文件夹
-	mkdir -p -m 777 "/$PROJECT_ROOT/dockerFile"
-	# 网页 web 服务文件根地址（仅 root 和开发、运维具有权限）
-	mkdir -p -m 777 "/$PROJECT_ROOT/html/www"
+	mkdir -pv -m 777 /root/.ssh /$ROOT_PATH/{.env/{nginx/{cert,_letsencrypt,tcoffe/conf,$PROJECT_CODE/conf},\
+	db/{mysql,mongo,redis,postgres},docker/images,nodejs/{bin,cache,global,link,offline},codeServer,gitLab,svn,frp,noVnc},\
+	common,$PROJECT_CODE/{data,html/{www,files,docs},svrApp,gitRepo},\
+	backup/{$PROJECT_CODE/{nginx/{www,conf.d,files,docs},db/{timing/{mysql,mongo,redis,postgres},manual}},tcoffe/{nginx/{www,conf.d,files,docs},db/{timing/{mysql,mongo,redis,postgres},manual}}},\
+	logs/{db/{mysql,mongo,redis,postgres},$PROJECT_CODE,tcoffe}}
+	# 确保默认项目代码：tcoffe 存在
+	mkdir -pv -700 /$ROOT_PATH/tcoffe/{data,html/{www,files,docs},svrApp,gitRepo}
+	mkdir -p -m 600 /$ROOT_PATH/common/.smpoo
+
 	# 为系统添加 prod 和 dev 用户
 	adduser dev
 	adduser prod
@@ -270,7 +219,7 @@ function installDocker() {
 	# 修改镜像存储位置
 	touch /etc/docker/daemon.json
 	echo "{" >> /etc/docker/daemon.json
-	echo "\"data-root\": \"/smpoo_file/common/.docker/image\"" >> /etc/docker/daemon.json
+	echo "\"data-root\": \"/smpoo_file/.env/docker/image\"" >> /etc/docker/daemon.json
 	echo "}" >> /etc/docker/daemon.json
 	systemctl start docker.socket
 	systemctl start docker

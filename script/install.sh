@@ -180,14 +180,39 @@ function prepareSysParam() {
 }
 # 预准备项目文件夹和用户
 function preparePath() {
-	mkdir -pv -m 777 /root/.ssh /$ROOT_PATH/{.env/{nginx/{cert,_letsencrypt,tcoffe/conf,$PROJECT_CODE/conf},\
-	db/{mysql,mongo,redis,postgres},docker/images,nodejs/{bin,cache,global,link,offline},codeServer,gitLab,svn,frp,noVnc},\
-	common,$PROJECT_CODE/{data,html/{www,files,docs},svrApp,gitRepo},\
-	backup/{$PROJECT_CODE/{nginx/{www,conf.d,files,docs},db/{timing/{mysql,mongo,redis,postgres},manual}},tcoffe/{nginx/{www,conf.d,files,docs},db/{timing/{mysql,mongo,redis,postgres},manual}}},\
-	logs/{db/{mysql,mongo,redis,postgres},$PROJECT_CODE,tcoffe}}
-	# 确保默认项目代码：tcoffe 存在
-	mkdir -pv -700 /$ROOT_PATH/tcoffe/{data,html/{www,files,docs},svrApp,gitRepo}
-	mkdir -p -m 600 /$ROOT_PATH/common/.smpoo
+	mkdir -pv -m 777 /root/.ssh /$ROOT_PATH
+	cd /$ROOT_PATH
+	mkdir -pv -m 600 common/.smpoo
+	# .env
+	mkdir -pv -m 777 .env backup logs/nginx tcoffe
+	cd /$ROOT_PATH/.env
+	mkdir -pv -m 777 nginx db docker/images nodejs codeServer gitLab svn frp noVnc
+	cd /$ROOT_PATH/.env/nginx
+	mkdir -pv -m 777 cert _letsencrypt tcoffe/conf
+	cd /$ROOT_PATH/.env/db
+	mkdir -pv -m 777 mysql mongo redis postgres
+	cd /$ROOT_PATH/.env/nodejs
+	mkdir -pv -m 777 bin cache global link offline
+	# backup
+	cd /$ROOT_PATH/backup/tcoffe
+	mkdir -pv -m 777 nginx db
+	cd /$ROOT_PATH/backup/tcoffe/nginx && mkdir www conf.d files docs
+	cd /$ROOT_PATH/backup/tcoffe/db && mkdir timing manual
+	cd /$ROOT_PATH/backup/tcoffe/db/timing && mkdir mysql mongo redis postgres
+	# logs
+	cd /$ROOT_PATH/logs && mkdir -pv -m 777 db/mysql db/mongo db/redis db/postgres tcoffe
+	# 项目主服务
+	cd /$ROOT_PATH/tcoffe && mkdir -pv -m 777 data html/www html/files html/docs svrApp gitRepo
+
+
+	# mkdir -pv -m 777 /root/.ssh /$ROOT_PATH/{.env/{nginx/{cert,_letsencrypt,tcoffe/conf,$PROJECT_CODE/conf},\
+	# db/{mysql,mongo,redis,postgres},docker/images,nodejs/{bin,cache,global,link,offline},codeServer,gitLab,svn,frp,noVnc},\
+	# common,$PROJECT_CODE/{data,html/{www,files,docs},svrApp,gitRepo},\
+	# backup/{$PROJECT_CODE/{nginx/{www,conf.d,files,docs},db/{timing/{mysql,mongo,redis,postgres},manual}},tcoffe/{nginx/{www,conf.d,files,docs},db/{timing/{mysql,mongo,redis,postgres},manual}}},\
+	# logs/{db/{mysql,mongo,redis,postgres},$PROJECT_CODE,tcoffe}}
+	# # 确保默认项目代码：tcoffe 存在
+	# mkdir -pv -700 /$ROOT_PATH/tcoffe/{data,html/{www,files,docs},svrApp,gitRepo}
+	# mkdir -p -m 600 /$ROOT_PATH/common/.smpoo
 
 	# 为系统添加 prod 和 dev 用户
 	adduser dev

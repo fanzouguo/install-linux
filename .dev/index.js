@@ -23,10 +23,11 @@ const setVer = async () => {
 	const pkg = await fs.readJson(pkgPath, {
 		encoding: 'utf8'
 	});
-	console.log(`当前版本号：${pkg.version}`);
+	const oldVer = pkg.version;
+	console.log(`当前版本号：${oldVer}`);
 
 	const verPolice = await getAnswer('请选择版本策略：1) 更改主版本号 / 2) 子版本号 / 3 或回车) 修订号 -->');
-	const [a, b, c] = `${pkg.version}`.split('.').map(v => +v);
+	const [a, b, c] = `${oldVer}`.split('.').map(v => +v);
 	const _arr = [];
 	const answer = +verPolice;
 	if (answer === 1) {
@@ -42,7 +43,17 @@ const setVer = async () => {
 		encoding: 'utf8',
 		spaces: 2
 	});
+	await updateReadme(oldVer, newVer);
 	return newVer;
+};
+
+const getStr = verStr => `/install-linux@${verStr}/script/install.sh`;
+const updateReadme = async (verOld, verNew) => {
+	const pathReadme = path.resolve(process.cwd(), 'README.md');
+	const readmeFileStr = await fs.readFile(pathReadme, {
+		encoding: 'utf8'
+	});
+	fs.writeFile(pathReadme, readmeFileStr.replace(getStr(verOld), getStr(verNew)));
 };
 
 // 5、提交 git Hub

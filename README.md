@@ -7,12 +7,12 @@ tFrame工程脚本集合
 ### 初始化 Linux 服务器
 > #### 推荐：(避免防火墙干扰，下载即安装)
 ```shell
-sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/script/install.sh -O -)"
+sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@14.0.0/script/install.sh -O -)"
 ```
 
 > #### 获取执行命令时，可以传入项目名称
 ```shell
-wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/script/install.sh | sh [项目名称]
+wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@13.0.0/script/install.sh | sh [项目名称]
 # OR
 wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@仓库最新版本号/script/install.sh | sh [项目名称]
 ```
@@ -22,12 +22,12 @@ curl https://raw.githubusercontent.com/fanzouguo/install-linux/main/script/insta
 ```
 > #### 若因防火墙原因无法访问，则改为
 ```shell
-curl -o-  https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/script/install.sh | bash
+curl -o-  https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@13.0.0/script/install.sh | bash
 ```
 
 > #### 或者
 ```shell
-wget -qO- https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/script/install.sh | bash
+wget -qO- https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@13.0.0/script/install.sh | bash
 ```
 
 > #### 或者

@@ -204,16 +204,6 @@ function preparePath() {
 	# 项目主服务
 	cd /$ROOT_PATH/tcoffe && mkdir -pv -m 777 data html/www html/files html/docs svrApp gitRepo
 
-
-	# mkdir -pv -m 777 /root/.ssh /$ROOT_PATH/{.env/{nginx/{cert,_letsencrypt,tcoffe/conf,$PROJECT_CODE/conf},\
-	# db/{mysql,mongo,redis,postgres},docker/images,nodejs/{bin,cache,global,link,offline},codeServer,gitLab,svn,frp,noVnc},\
-	# common,$PROJECT_CODE/{data,html/{www,files,docs},svrApp,gitRepo},\
-	# backup/{$PROJECT_CODE/{nginx/{www,conf.d,files,docs},db/{timing/{mysql,mongo,redis,postgres},manual}},tcoffe/{nginx/{www,conf.d,files,docs},db/{timing/{mysql,mongo,redis,postgres},manual}}},\
-	# logs/{db/{mysql,mongo,redis,postgres},$PROJECT_CODE,tcoffe}}
-	# # 确保默认项目代码：tcoffe 存在
-	# mkdir -pv -700 /$ROOT_PATH/tcoffe/{data,html/{www,files,docs},svrApp,gitRepo}
-	# mkdir -p -m 600 /$ROOT_PATH/common/.smpoo
-
 	# 为系统添加 prod 和 dev 用户
 	adduser dev
 	adduser prod

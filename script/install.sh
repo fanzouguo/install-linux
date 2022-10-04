@@ -126,6 +126,7 @@ function getBrand() {
 }
 # 更改系统源阿里源
 function changeSource() {
+	tipGreen "更换系统源"
 	# 更换主源文件
 	cd /etc/yum.repos.d/
 	mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bk
@@ -162,6 +163,7 @@ function changeSource() {
 }
 # 预处理操作系统环境
 function prepareSysParam() {
+	tipGreen "系统环境预处理"
 	# 关闭seinux
 	sed -i -e "s#SELINUX=.*#SELINUX=disabled#" /etc/selinux/config
 	setenforce 0
@@ -180,9 +182,10 @@ function prepareSysParam() {
 }
 # 预准备项目文件夹和用户
 function preparePath() {
+	tipGreen "文件夹初始化"
 	mkdir -pv -m 777 /root/.ssh /$ROOT_PATH
 	cd /$ROOT_PATH
-	mkdir -pv -m 600 common/.smpoo
+	mkdir -pv -m 755 common/.smpoo
 	# .env
 	mkdir -pv -m 777 .env backup/tcoffe logs/nginx tcoffe
 	cd /$ROOT_PATH/.env
@@ -210,6 +213,7 @@ function preparePath() {
 }
 # 安装 Docker
 function installDocker() {
+	tipGreen "安装 Docker"
 	# 卸载可能已安装过的旧版Docker(如果存在的话)
 	yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine docker-ce
 	# 设置 Docker 仓库
@@ -238,10 +242,18 @@ function installDocker() {
 }
 # 安装 cockpit
 function installCockpit() {
+	tipGreen "安装 Cockpit"
 	yum install -y cockpit cockpit-docker cockpit-machines cockpit-dashboard cockpit-storaged cockpit-packagekit
 	systemctl enable --now cockpit
 	firewall-cmd --permanent --zone=public --add-service=cockpit
 	firewall-cmd --reload
+}
+# 初始化资源包
+function initAssets() {
+	tipGreen "资源包初始化"
+	cd /smpoo_file/common/.smpoo
+	wget -c https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/assets/smpoo.tar.gz -O - | tar -xz
+	cd ~
 }
 # 环境清理
 function cleanEnv() {
@@ -267,6 +279,10 @@ function echoReport() {
 	getLine
 	tipGreen 字符集
 	locale
+	tipGreen 资源包
+	cd /smpoo_file/common/.smpoo
+	ll
+	cd ~
 
 	# 输出 SMPOO_LOGO
 	tipFinish
@@ -301,6 +317,8 @@ openPort
 installDocker
 # 0.5 安装 Cockpit
 installCockpit
+# 0.6 初始化资源包
+initAssets
 # 0.9 显示安装报告
 echoReport
 

@@ -7,7 +7,7 @@ tFrame工程脚本集合
 ### 初始化 Linux 服务器
 > #### 推荐：(避免防火墙干扰，下载即安装)
 ```shell
-sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@16.0.0/script/install.sh -O -)"
+sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@16.1.0/script/install.sh -O -)"
 ```
 
 > #### 获取执行命令时，可以传入项目名称

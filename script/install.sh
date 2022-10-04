@@ -205,7 +205,7 @@ function preparePath() {
 	# logs
 	cd /$ROOT_PATH/logs && mkdir -pv -m 777 db/mysql db/mongo db/redis db/postgres tcoffe
 	# 项目主服务
-	cd /$ROOT_PATH/tcoffe && mkdir -pv -m 777 data html/www html/files html/docs svrApp gitRepo
+	cd /$ROOT_PATH/tcoffe && mkdir -pv -m 777 data html/www html/files html/docs project gitRepo
 
 	# 为系统添加 prod 和 dev 用户
 	adduser dev

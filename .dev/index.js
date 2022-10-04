@@ -53,7 +53,8 @@ const updateReadme = async (verOld, verNew) => {
 	const readmeFileStr = await fs.readFile(pathReadme, {
 		encoding: 'utf8'
 	});
-	fs.writeFile(pathReadme, readmeFileStr.replace(getStr(verOld), getStr(verNew)));
+	const regStr = new RegExp(getStr(verOld), 'g');
+	fs.writeFile(pathReadme, readmeFileStr.replace(regStr, getStr(verNew)));
 };
 
 // 5、提交 git Hub

@@ -187,7 +187,7 @@ function preparePath() {
 	cd /$ROOT_PATH
 	mkdir -pv -m 755 common/.smpoo
 	# .env
-	mkdir -pv -m 777 .env backup/tcoffe logs/nginx tcoffe
+	mkdir -pv -m 777 .env backup/tcoffe logs/nginx project/tcoffe
 	cd /$ROOT_PATH/.env
 	mkdir -pv -m 777 nginx db docker/images nodejs codeServer gitLab svn frp noVnc
 	cd /$ROOT_PATH/.env/nginx
@@ -205,7 +205,7 @@ function preparePath() {
 	# logs
 	cd /$ROOT_PATH/logs && mkdir -pv -m 777 db/mysql db/mongo db/redis db/postgres tcoffe
 	# 项目主服务
-	cd /$ROOT_PATH/tcoffe && mkdir -pv -m 777 data html/www html/files html/docs project gitRepo
+	cd /$ROOT_PATH/project/tcoffe && mkdir -pv -m 777 data html/www html/files html/docs nodePj gitRepo
 
 	# 为系统添加 prod 和 dev 用户
 	adduser dev
@@ -254,6 +254,23 @@ function initAssets() {
 	cd /smpoo_file/common/.smpoo
 	wget -c https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/assets/smpoo.tar.gz -O - | tar -xz
 	cd ~
+}
+# 初始化 monoRepo 工作空间
+function initMono() {
+	cat >> /smpoo_file/.npmrc << EOF
+shamefully-hoist = true
+prefer-workspace-packages = true
+auto-install-peers = true
+save-workspace-protocol = true
+save-prefix = ''
+engin-strict = true
+EOF
+
+
+	cat >> /smpoo_file/pnpm-workspace.yaml << EOF
+packages:
+  - 'project/**/*'
+EOF
 }
 # 环境清理
 function cleanEnv() {
@@ -319,6 +336,8 @@ installDocker
 installCockpit
 # 0.6 初始化资源包
 initAssets
+# 0.7 初始化 monoRepo 工作空间
+initMono
 # 0.9 显示安装报告
 echoReport
 

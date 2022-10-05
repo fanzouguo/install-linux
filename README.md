@@ -7,16 +7,16 @@ tFrame工程脚本集合
 ### 初始化 Linux 服务器
 > #### 推荐：(避免防火墙干扰，下载即安装)
 ```shell
-sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@18.0.0/script/install.sh -O -)"
+sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@19.0.0/script/install.sh -O -)"
 ```
 > #### 或：
 ```shell
-curl -o- https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@18.0.0/script/install.sh | bash
+curl -o- https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@19.0.0/script/install.sh | bash
 ```
 
 > #### 也可以在初始化时，传入项目名称，项目名称缺省为：tcoffe
 ```shell
-wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@18.0.0/script/install.sh | sh [项目名称]
+wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@19.0.0/script/install.sh | sh [项目名称]
 ```
 
 ## 工作空间结构
@@ -46,6 +46,33 @@ wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@18.0.0/script/install.s
 	</tbody>
 </table>
 
+> #### 服务器端 monoRepo 默认结构
+<table class="tableWrapper">
+	<thead>
+		<tr>
+			<th class="textCenter">文件夹名称</th>
+			<th class="textCenter">说明</th>
+			<th class="textCenter">备注</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>node_module</td>
+			<td>node_module 服务器端</td>
+			<td>该目录在服务器初始化后，不会立即建立，而是通过项目的 pnpm 执行包安装后创建</td>
+		</tr>
+		<tr>
+			<td>.npmrc</td>
+			<td>基于 pnpm 工作空间的配置文件</td>
+			<td>.npmrc 系文件，而非目录</td>
+		</tr>
+		<tr>
+			<td>pnpm-workspace.yaml</td>
+			<td>基于 pnpm 的 monoRepo 配置文件</td>
+			<td>pnpm-workspace.yaml 系文件，而非目录</td>
+		</tr>
+	</tbody>
+</table>
 
 > #### .env 环境文件夹
 <table class="tableWrapper">
@@ -59,7 +86,7 @@ wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@18.0.0/script/install.s
 	<tbody>
         <!-- nginx -->
 		<tr>
-			<td rowspan="18">.env</td>
+			<td rowspan="24">.env</td>
 			<td rowspan="3">nginx</td>
 			<td colspan="2">cert</td>
 			<td>存放 SSL 证书的目录</td>
@@ -92,69 +119,104 @@ wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@18.0.0/script/install.s
 		<tr>
 			<td colspan="2">postgres</td>
 		</tr>
-        <!-- docker -->
+		<!-- docker -->
 		<tr>
 			<td>docker</td>
 			<td colspan="2">images</td>
 			<td>docker 镜像存储路径</td>
 			<td></td>
 		</tr>
-        <!-- nodejs -->
+		<!-- nodejs - Npm -->
 		<tr>
-			<td rowspan="5">nodejs</td>
-			<td colspan="2">bin</td>
-			<td>全局bin目录-（pnpm适用）</td>
+			<td rowspan="11">nodejs</td>
+			<td rowspan="2">npmRepo</td>
+			<td>global</td>
+			<td>适用于 NPM 的全局包路径</td>
+			<td rowspan="11">[Docker-nodejs]:/smpoo_file/.env/nodejs</td>
+		</tr>
+		<tr>
+			<td>cache</td>
+			<td>适用于 NPM 的全局缓存目录</td>
+			<td></td>
+		</tr>
+		<!-- nodejs - Pnpm -->
+		<tr>
+			<td rowspan="4">pnpmRepo</td>
+			<td>bin</td>
+			<td>适用于 PNPM 的执行文件路径</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td colspan="2">cache</td>
-			<td>全局缓存目录</td>
+			<td>.store</td>
+			<td>适用于 PNPM 的全局仓库路径(类似 .git 仓库)</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td colspan="2">global</td>
-			<td>全局包目录</td>
+			<td>global</td>
+			<td>适用于 PNPM 的全局包路径</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td colspan="2">link</td>
-			<td>全局链接（YARN适用）</td>
+			<td>cache</td>
+			<td>适用于 PNPM 的全局缓存目录</td>
+			<td></td>
+		</tr>
+		<!-- nodejs - Yarn -->
+		<tr>
+			<td rowspan="5">yarnRepo</td>
+			<td>bin</td>
+			<td>适用于 YARN 的执行文件路径</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td colspan="2">offline</td>
-			<td>全局离线包目录（YARN使用）</td>
+			<td>global</td>
+			<td>适用于 YARN 的全局包路径</td>
 			<td></td>
 		</tr>
-        <!-- codeServer -->
+		<tr>
+			<td>cache</td>
+			<td>适用于 YARN 的全局缓存目录</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>link</td>
+			<td>适用于 YARN 的全局链接目录</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>offline</td>
+			<td>适用于 YARN 的全局离线安装包目录</td>
+			<td></td>
+		</tr>
+		<!-- codeServer -->
 		<tr>
 			<td>codeServer</td>
 			<td colspan="2"></td>
 			<td>code-server 服务环境路径</td>
 			<td>[Docker-codeServer]:/待补充</td>
 		</tr>
-        <!-- gitLab -->
+		<!-- gitLab -->
 		<tr>
 			<td>gitLab</td>
 			<td colspan="2"></td>
 			<td>gitLab 服务环境路径</td>
 			<td>[Docker-gitLab]:/待补充</td>
 		</tr>
-        <!-- svn -->
+		<!-- svn -->
 		<tr>
 			<td>svn</td>
 			<td colspan="2"></td>
 			<td>svn 服务环境路径</td>
 			<td>[Docker-svn]:/待补充</td>
 		</tr>
-        <!-- frp -->
+		<!-- frp -->
 		<tr>
 			<td>frp</td>
 			<td colspan="2"></td>
 			<td>frp 远程穿透服务环境路径</td>
 			<td>[Docker-frp]:/待补充</td>
 		</tr>
-        <!-- noVnc -->
+		<!-- noVnc -->
 		<tr>
 			<td>noVnc</td>
 			<td colspan="2"></td>
@@ -169,13 +231,14 @@ wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@18.0.0/script/install.s
 <table class="tableWrapper">
 	<thead>
 		<tr>
-			<th colspan="3" class="textCenter">文件夹名称</th>
+			<th colspan="4" class="textCenter">文件夹名称</th>
 			<th class="textCenter">说明</th>
 			<th class="textCenter">对应容器内路径</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
+			<td rowspan="15"><span class="projectCode">project</span></td>
 			<td rowspan="14"><span class="projectCode">项目代号</span></td>
 			<td>data</td>
 			<td>系统默认项目代号为：tcoffe</td>
@@ -198,10 +261,10 @@ wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@18.0.0/script/install.s
 			<td>[Docker-db-redis]:/smpoo_file/html/docs</td>
 		</tr>
 		<tr>
-			<td rowspan="9">svrApp</td>
+			<td rowspan="9">nodePj</td>
 			<td>node_module</td>
 			<td>服务端主程序依赖的 NodeJs 包路径</td>
-			<td></td>
+			<td rowspan="9">[Docker-nodejs]:/smpoo_file/nodePj</td>
 		</tr>
 		<tr>
 			<td>adminSvr</td>
@@ -247,6 +310,11 @@ wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@18.0.0/script/install.s
 			<td colspan="2">gitRepo</td>
 			<td>本项目的 github 操作空间</td>
 			<td></td>
+		</tr>
+		<tr>
+			<td colspan="3">项目代号-2</td>
+			<td>另一个项目的根文件夹</td>
+			<td>[Docker-nodejs]:/smpoo_file/nodePj</td>
 		</tr>
 	</tbody>
 </table>

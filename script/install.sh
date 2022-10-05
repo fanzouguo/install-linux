@@ -195,7 +195,7 @@ function preparePath() {
 	cd /$ROOT_PATH/.env/db
 	mkdir -pv -m 777 mysql mongo redis postgres
 	cd /$ROOT_PATH/.env/nodejs
-	mkdir -pv -m 777 bin cache global link offline
+	mkdir -pv -m 777 npmRepo/cache npmRepo/global pnpmRepo/.store pnpmRepo/cache pnpmRepo/global pnpmRepo/bin yarnRepo/bin yarnRepo/cache yarnRepo/global yarnRepo/link yarnRepo/offline
 	# backup
 	cd /$ROOT_PATH/backup/tcoffe
 	mkdir -pv -m 777 nginx db

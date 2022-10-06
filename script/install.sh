@@ -187,23 +187,28 @@ function preparePath() {
 	cd /$ROOT_PATH
 	mkdir -pv -m 755 common/.smpoo
 	# .env
-	mkdir -pv -m 777 .env backup/tcoffe logs/nginx project/tcoffe
-	cd /$ROOT_PATH/.env
-	mkdir -pv -m 777 nginx db docker/images nodejs codeServer gitLab svn frp noVnc
-	cd /$ROOT_PATH/.env/nginx
-	mkdir -pv -m 777 cert _letsencrypt tcoffe/conf
-	cd /$ROOT_PATH/.env/db
+	mkdir -pv -m 777 .env/common .env/tcoffe backup/tcoffe logs/tcoffe project/tcoffe
+	# 公共环境路径
+	cd /$ROOT_PATH/.env/common
+	mkdir -pv -m 777 docker/images codeServer gitLab svn frp noVnc
+	# 项目环境路径
+	cd /$ROOT_PATH/.env/tcoffe
+	mkdir -pv -m 777 nginx db nodejs
+
+	cd /$ROOT_PATH/.env/tcoffe/nginx
+	mkdir -pv -m 777 cert _letsencrypt conf
+	cd /$ROOT_PATH/.env/tcoffe/db
 	mkdir -pv -m 777 mysql mongo redis postgres
-	cd /$ROOT_PATH/.env/nodejs
+	cd /$ROOT_PATH/.env/tcoffe/nodejs
 	mkdir -pv -m 777 npmRepo/cache npmRepo/global pnpmRepo/.store pnpmRepo/cache pnpmRepo/global pnpmRepo/bin yarnRepo/bin yarnRepo/cache yarnRepo/global yarnRepo/link yarnRepo/offline
 	# backup
 	cd /$ROOT_PATH/backup/tcoffe
-	mkdir -pv -m 777 nginx db
+	mkdir -pv -m 777 nginx db nodePj
 	cd /$ROOT_PATH/backup/tcoffe/nginx && mkdir www conf.d files docs
 	cd /$ROOT_PATH/backup/tcoffe/db && mkdir timing manual
 	cd /$ROOT_PATH/backup/tcoffe/db/timing && mkdir mysql mongo redis postgres
 	# logs
-	cd /$ROOT_PATH/logs && mkdir -pv -m 777 db/mysql db/mongo db/redis db/postgres tcoffe
+	cd /$ROOT_PATH/logs/tcoffe && mkdir -pv -m 777 nginx db/mysql db/mongo db/redis db/postgres nodePj
 	# 项目主服务
 	cd /$ROOT_PATH/project/tcoffe && mkdir -pv -m 777 data html/www html/files html/docs nodePj gitRepo
 
@@ -272,6 +277,63 @@ packages:
   - 'project/**/*'
 EOF
 }
+# 初始化 html/www/index.html 文件
+function initWWW() {
+	cat >> /smpoo_file/project/html/www/index.html << EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>上海深普软件-Nginx Docker Image</title>
+	<link  href="/smpoo/favicon.ico"  rel="shortcut icon"/>
+	<style>
+		html, body {
+			width: 100vw;
+			height: 100vh;
+			padding: 0;
+			margin: 0;
+			background-color: #424c50;
+			overflow: hidden;
+		}
+
+		.dockerImageWrapper {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100vw;
+			height: 100vh;
+			background-color: transparent;
+		}
+	</style>
+</head>
+<body>
+	<div class="dockerImageWrapper">
+		<svg xmlns="http://www.w3.org/2000/svg" width="100" height="140" viewBox="0 0 100 100">
+			<path d="M 52, 5 L 18, 24 L 18, 52  L 52, 33 Z" fill="#E68524">
+				<animate attributeType="XML" attributeName="fill" from="#fff" to="#E68524" dur="5s"/>
+			</path>
+			<path d="M 18, 52 L 38, 63 L 38, 41 Z" fill="#F2E2C6">
+				<animate attributeType="XML" attributeName="fill" from="#fff" to="#F2E2C6" dur="5s"/>
+			</path>
+			<path d="M 44, 73 L 78, 54 L 78, 26 L 44, 45 Z" fill="#6B6B6B">
+				<animate attributeType="XML" attributeName="fill" from="#fff" to="#6B6B6B" dur="5s"/>
+			</path>
+			<path d="M 78, 26 L 58, 15 L 58, 37 Z" fill="#C1C1C1">
+				<animate attributeType="XML" attributeName="fill" from="#fff" to="#C1C1C1" dur="5s"/>
+			</path>
+			<text id="logoTxt" x="12" y="100" font-size="22" stroke="#E68524" stroke-width=".5" stroke-dasharray="200" stroke-dashoffset="200" fill="#fff">Smpoo
+				<animate attributeType="XML" attributeName="stroke-dashoffset" from="200" to="0" begin=".5s" dur="4s"/>
+				<animate attributeType="XML" attributeName="fill" from="transparent" to="#fff" begin="1.8" dur="3.5s"/>
+				<animate attributeType="XML" attributeName="stroke" from="#E68524" to="#fff" begin="3" dur="2s" fill="freeze"/>
+			</text>
+		</svg>
+	</div>
+</body>
+</html>
+EOF
+}
 # 环境清理
 function cleanEnv() {
 	tipGreen "环境清理"
@@ -297,8 +359,7 @@ function echoReport() {
 	tipGreen 字符集
 	locale
 	tipGreen 资源包
-	cd /smpoo_file/common/.smpoo
-	ll
+	ls -laF /smpoo_file/common/.smpoo
 	cd ~
 
 	# 输出 SMPOO_LOGO

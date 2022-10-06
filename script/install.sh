@@ -239,7 +239,7 @@ function installDocker() {
 	# 修改镜像存储位置
 	touch /etc/docker/daemon.json
 	echo "{" >> /etc/docker/daemon.json
-	echo "\"data-root\": \"/smpoo_file/.env/docker/images\"" >> /etc/docker/daemon.json
+	echo "\"data-root\": \"/$ROOT_PATH/.env/docker/images\"" >> /etc/docker/daemon.json
 	echo "}" >> /etc/docker/daemon.json
 	systemctl start docker.socket
 	systemctl start docker
@@ -256,83 +256,13 @@ function installCockpit() {
 # 初始化资源包
 function initAssets() {
 	tipGreen "资源包初始化"
-	cd /smpoo_file/common/.smpoo
+	cd /$ROOT_PATH
+	wget -c https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/assets/pnpm.tar.gz -O - | tar -xz
+	cd /$ROOT_PATH/common/.smpoo
 	wget -c https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/assets/smpoo.tar.gz -O - | tar -xz
+	cd /$ROOT_PATH/tcoffe/html/www
+	wget -c https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@main/assets/www.tar.gz -O - | tar -xz
 	cd ~
-}
-# 初始化 monoRepo 工作空间
-function initMono() {
-	cat >> /smpoo_file/.npmrc << EOF
-shamefully-hoist = true
-prefer-workspace-packages = true
-auto-install-peers = true
-save-workspace-protocol = true
-save-prefix = ''
-engin-strict = true
-EOF
-
-
-	cat >> /smpoo_file/pnpm-workspace.yaml << EOF
-packages:
-  - 'project/**/*'
-EOF
-}
-# 初始化 html/www/index.html 文件
-function initWWW() {
-	cat >> /smpoo_file/project/html/www/index.html << EOF
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>上海深普软件-Nginx Docker Image</title>
-	<link  href="/smpoo/favicon.ico"  rel="shortcut icon"/>
-	<style>
-		html, body {
-			width: 100vw;
-			height: 100vh;
-			padding: 0;
-			margin: 0;
-			background-color: #424c50;
-			overflow: hidden;
-		}
-
-		.dockerImageWrapper {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			width: 100vw;
-			height: 100vh;
-			background-color: transparent;
-		}
-	</style>
-</head>
-<body>
-	<div class="dockerImageWrapper">
-		<svg xmlns="http://www.w3.org/2000/svg" width="100" height="140" viewBox="0 0 100 100">
-			<path d="M 52, 5 L 18, 24 L 18, 52  L 52, 33 Z" fill="#E68524">
-				<animate attributeType="XML" attributeName="fill" from="#fff" to="#E68524" dur="5s"/>
-			</path>
-			<path d="M 18, 52 L 38, 63 L 38, 41 Z" fill="#F2E2C6">
-				<animate attributeType="XML" attributeName="fill" from="#fff" to="#F2E2C6" dur="5s"/>
-			</path>
-			<path d="M 44, 73 L 78, 54 L 78, 26 L 44, 45 Z" fill="#6B6B6B">
-				<animate attributeType="XML" attributeName="fill" from="#fff" to="#6B6B6B" dur="5s"/>
-			</path>
-			<path d="M 78, 26 L 58, 15 L 58, 37 Z" fill="#C1C1C1">
-				<animate attributeType="XML" attributeName="fill" from="#fff" to="#C1C1C1" dur="5s"/>
-			</path>
-			<text id="logoTxt" x="12" y="100" font-size="22" stroke="#E68524" stroke-width=".5" stroke-dasharray="200" stroke-dashoffset="200" fill="#fff">Smpoo
-				<animate attributeType="XML" attributeName="stroke-dashoffset" from="200" to="0" begin=".5s" dur="4s"/>
-				<animate attributeType="XML" attributeName="fill" from="transparent" to="#fff" begin="1.8" dur="3.5s"/>
-				<animate attributeType="XML" attributeName="stroke" from="#E68524" to="#fff" begin="3" dur="2s" fill="freeze"/>
-			</text>
-		</svg>
-	</div>
-</body>
-</html>
-EOF
 }
 # 环境清理
 function cleanEnv() {
@@ -359,7 +289,7 @@ function echoReport() {
 	tipGreen 字符集
 	locale
 	tipGreen 资源包
-	ls -laF /smpoo_file/common/.smpoo
+	ls -laF /$ROOT_PATH/common/.smpoo
 	cd ~
 
 	# 输出 SMPOO_LOGO
@@ -397,8 +327,6 @@ installDocker
 installCockpit
 # 0.6 初始化资源包
 initAssets
-# 0.7 初始化 monoRepo 工作空间
-initMono
 # 0.9 显示安装报告
 echoReport
 

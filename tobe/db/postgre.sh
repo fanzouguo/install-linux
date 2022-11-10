@@ -1,12 +1,13 @@
 #!/usr/bin/expect -f
 
 set timeout 3
-set dbPwdRoot "Smpoo@2015"
+set dbPwdSuper "Smpoo@2015"
+set dbPwdRoot "Root@2015"
 set dbPwdDev "Dev@2015"
 set dbPwdProd "SmpooProd@2021"
 set tblName "mysql"
 
-set strChangePwdRoot "ALTER USER postgres WITH PASSWORD '$dbPwdRoot';\r"
+set strChangePwdRoot "ALTER USER postgres WITH PASSWORD '$dbPwdSuper';\r"
 set strRootUser "CREATE USER root WITH PASSWORD '$dbPwdDev';\r"
 set strDevUser "CREATE USER dev WITH PASSWORD '$dbPwdDev';\r"
 set strProdUser "CREATE USER prod WITH PASSWORD '$dbPwdProd';\r"

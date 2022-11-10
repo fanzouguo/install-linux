@@ -106,6 +106,13 @@ function showLine() {
 # 脚本启动准备
 function beforInit() {
 	clear
+	echo -e "\e[44;37;1m是否继续进行? [取消安装(n/N) | 其他任意键继续 ] \e[0m"
+	read -n 1 -p "" isRight
+	if echo "$isRight" | grep -qwi "n"
+	then
+		echo -e "\n\n安装已取消！\n"
+		exit 1
+	fi
 	cd /root
 }
 # 创建服务器 README.md 说明
@@ -114,7 +121,6 @@ function createSvrDoc() {
 	echo -e "# 文件夹说明\n---\n" >> $readmePath
 	echo "## 文档结构" >> $readmePath
 	echo "|-- .docker    本机 Docker 实例的镜像、容器、日志、数据卷等文件夹" >> $readmePath
-	echo "   |-- images        镜像文件夹" >> $readmePath
 	echo "-----------------------------------------------------" >> $readmePath
 	echo "|-- .nginx      本机 Nginx 实例的配置文件集合" >> $readmePath
 	echo "   |-- conf          配置文件数据盘" >> $readmePath
@@ -241,7 +247,7 @@ function preparePath() {
 
 		cd $ROOT_PATH
 		# 在首次初始化时初始化根目录
-		mkdir -pv .backup .db .docker/images .logs .nginx/{conf,_letsencrypt} .python/{v2.7,v3.0} common/.smpoo project scricpt tools
+		mkdir -pv .backup .db .docker .logs .nginx/{conf,_letsencrypt} .python/{v2.7,v3.0} common/.smpoo project scricpt tools
 		# docker
 		# nginx
 		# db
@@ -385,7 +391,7 @@ function installDocker() {
 	# 修改镜像存储位置
 	touch /etc/docker/daemon.json
 	echo "{" >> /etc/docker/daemon.json
-	echo "\"data-root\": \"/$ROOT_PATH/.docker/images\"" >> /etc/docker/daemon.json
+	echo "\"data-root\": \"/$ROOT_PATH/.docker\"" >> /etc/docker/daemon.json
 	echo "}" >> /etc/docker/daemon.json
 	systemctl start docker.socket
 	systemctl start docker
@@ -438,6 +444,7 @@ function baseDefense() {
 	# 升级 openssl 到 1.1.1
 	# 修复 Log4 漏洞
 	# 更改默认端口：22、3306、5432
+	echo ""
 }
 # 显示安装报告
 function getReport() {

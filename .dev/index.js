@@ -47,7 +47,7 @@ const setVer = async () => {
 	return newVer;
 };
 
-const getStr = verStr => `/install-linux@${verStr}/script/install.sh`;
+const getStr = verStr => `/install-linux@${verStr}/script/init.sh`;
 const updateReadme = async (verOld, verNew) => {
 	const pathReadme = path.resolve(process.cwd(), 'README.md');
 	const readmeFileStr = await fs.readFile(pathReadme, {

@@ -444,6 +444,8 @@ function baseDefense() {
 	# 升级 openssl 到 1.1.1
 	# 修复 Log4 漏洞
 	# 更改默认端口：22、3306、5432
+
+	chmod 700 /root/.ssh
 	echo ""
 }
 # 显示安装报告

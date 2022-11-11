@@ -44,10 +44,12 @@ const setVer = async () => {
 		spaces: 2
 	});
 	await updateReadme(oldVer, newVer);
+	await updateScriptVer(oldVer, newVer);
 	return newVer;
 };
 
 const getStr = verStr => `/install-linux@${verStr}/script/init.sh`;
+const getStr2 = verStr => `scricptVer="${verStr}"`;
 const updateReadme = async (verOld, verNew) => {
 	const pathReadme = path.resolve(process.cwd(), 'README.md');
 	const readmeFileStr = await fs.readFile(pathReadme, {
@@ -55,6 +57,15 @@ const updateReadme = async (verOld, verNew) => {
 	});
 	const regStr = new RegExp(getStr(verOld), 'g');
 	fs.writeFile(pathReadme, readmeFileStr.replace(regStr, getStr(verNew)));
+};
+
+const updateScriptVer = async (verOld, verNew) => {
+	const pathReadme = path.resolve(process.cwd(), 'script', 'install.sh');
+	const readmeFileStr = await fs.readFile(pathReadme, {
+		encoding: 'utf8'
+	});
+	const regStr = new RegExp(getStr2(verOld), 'g');
+	fs.writeFile(pathReadme, readmeFileStr.replace(regStr, getStr2(verNew)));
 };
 
 // 5、提交 git Hub

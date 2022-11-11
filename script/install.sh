@@ -10,6 +10,9 @@ PROJECT_NAME=""
 EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
+# 本脚本文件版本号（会在 pnpm build 时自动改变）
+scricptVer="21.2.0"
+
 # 本系统默认允许的端口
 # 前端服务端口：80 443 8080
 # SVN 接口 3690
@@ -34,6 +37,7 @@ function showSysInfo() {
 	echo 系统版本号：`cat /etc/redhat-release`
 	echo 服务器日期：$EXEC_DATE
 	echo 服务器 IP ：$ipStr
+	echo 脚本版本号：$scricptVer
 	echo "power by:   上海深普软件有限公司 - wwww.smpoo.com"
 	showLine
 	echo ""

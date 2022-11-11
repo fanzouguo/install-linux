@@ -11,7 +11,7 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="22.0.0"
+scricptVer="22.0.1"
 
 # 本系统默认允许的端口
 # 前端服务端口：80 443 8080
@@ -186,6 +186,8 @@ function preparePath() {
 		chmod 777 $ROOT_PATH/project
 		# 运维脚本集
 		chmod 777 $ROOT_PATH/scricpt
+		# 运维脚本集
+		chmod 777 $ROOT_PATH/tools
 	fi
 
 	mkdir -pv $ROOT_PATH/.logs/$PROJECT_NAME $ROOT_PATH/.backup/$PROJECT_NAME

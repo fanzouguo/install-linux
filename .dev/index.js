@@ -48,15 +48,20 @@ const setVer = async () => {
 	return newVer;
 };
 
-const getStr = verStr => `/install-linux@${verStr}/script/init.sh`;
-const getStr2 = verStr => `scricptVer="${verStr}"`;
+/** 获取 README.md 文件的版本替换值 */
+const strReplaceReadMe1 = verStr => `/install-linux@${verStr}/script/init.sh`;
+const strReplaceReadMe2 = verStr => `/install-linux/raw/v${verStr}/script`;
+/** 获取主脚本文件：install.sh 的版本替换值 */
+const strReplaceMain = verStr => `scricptVer="${verStr}"`;
 const updateReadme = async (verOld, verNew) => {
 	const pathReadme = path.resolve(process.cwd(), 'README.md');
 	const readmeFileStr = await fs.readFile(pathReadme, {
 		encoding: 'utf8'
 	});
-	const regStr = new RegExp(getStr(verOld), 'g');
-	fs.writeFile(pathReadme, readmeFileStr.replace(regStr, getStr(verNew)));
+	const regStr1 = new RegExp(strReplaceReadMe1(verOld), 'g');
+	const regStr2 = new RegExp(strReplaceReadMe2(verOld), 'g');
+	const fileData = readmeFileStr.replace(regStr1, strReplaceReadMe1(verNew)).replace(regStr2, strReplaceReadMe2(verNew));
+	fs.writeFile(pathReadme, fileData);
 };
 
 const updateScriptVer = async (verOld, verNew) => {
@@ -64,8 +69,8 @@ const updateScriptVer = async (verOld, verNew) => {
 	const readmeFileStr = await fs.readFile(pathReadme, {
 		encoding: 'utf8'
 	});
-	const regStr = new RegExp(getStr2(verOld), 'g');
-	fs.writeFile(pathReadme, readmeFileStr.replace(regStr, getStr2(verNew)));
+	const regStr = new RegExp(strReplaceMain(verOld), 'g');
+	fs.writeFile(pathReadme, readmeFileStr.replace(regStr, strReplaceMain(verNew)));
 };
 
 // 5、提交 git Hub

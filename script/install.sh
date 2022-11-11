@@ -117,94 +117,109 @@ function beforInit() {
 }
 # 创建服务器 README.md 说明
 function createSvrDoc() {
-	readmePath=$ROOT_PATH/README.md
+	readmePath=$ROOT_PATH/README.txt
 	echo -e "# 文件夹说明\n---\n" >> $readmePath
 	echo "## 文档结构" >> $readmePath
+	echo "|-- .env       本机所有项目及公共配置文件夹" >> $readmePath
+	echo "    └─ nginx       本机 Nginx 容器环境文件或应用配置文件" >> $readmePath
+	echo "       └─ cert         nginx 容器的 SSL 证书文件夹" >> $readmePath
+	echo "       └─ conf         配置文件数据盘" >> $readmePath
+	echo "       └─ _letsencrypt 用于certBot 的校验文件存放文件夹" >> $readmePath
+	echo "    └─ db          本机数据存容器环境文件或应用配置文件" >> $readmePath
+	echo "       └─ mongo        mongoDb 数据卷" >> $readmePath
+	echo "          └─ conf           配置文件夹" >> $readmePath
+	echo "          └─ data            数据文件夹" >> $readmePath
+	echo "       └─ mysql        mysqlDb 数据卷" >> $readmePath
+	echo "          └─ conf            配置文件夹" >> $readmePath
+	echo "          └─ data            数据文件夹" >> $readmePath
+	echo "       └─ postgres     postgresDb 数据卷" >> $readmePath
+	echo "          └─ conf            配置文件夹" >> $readmePath
+	echo "          └─ data            数据文件夹" >> $readmePath
+	echo "       └─ redis        redis 数据卷" >> $readmePath
+	echo "          └─ conf            配置文件夹" >> $readmePath
+	echo "          └─ data            数据文件夹" >> $readmePath
+	echo "       └─ meilisearch  meilisearch 全文搜索引擎数据盘" >> $readmePath
+	echo "          └─ conf            配置文件夹" >> $readmePath
+	echo "          └─ data            数据文件夹" >> $readmePath
+	echo "    └─ .nodeGlobal 工程级 NodeJs 全局库文件夹（匹配 NodeJs版本、python版本、）" >> $readmePath
+	echo "       └─ (12/14/16/18) nodeJs 全局库的 bin 文件，npm/yarn/pnpm 公用" >> $readmePath
+	echo "          └─ bin             nodeJs 全局库的 bin 文件，npm/yarn/pnpm 公用" >> $readmePath
+	echo "          └─ npmRepo         基于 Npm 的全局库" >> $readmePath
+	echo "             └─ cache           缓存文件夹" >> $readmePath
+	echo "             └─ global          全局包文件夹" >> $readmePath
+	echo "          └─ yarnRepo        基于 Yarn 的全局库" >> $readmePath
+	echo "             └─ cache           缓存文件夹" >> $readmePath
+	echo "             └─ global          全局包文件夹" >> $readmePath
+	echo "             └─ link            全局链接文件夹" >> $readmePath
+	echo "             └─ offlinel        全局离线缓存文件夹" >> $readmePath
+	echo "          └─ pnpmRepo        基于 Pnpm 的全局库" >> $readmePath
+	echo "             └─ cache           缓存文件夹" >> $readmePath
+	echo "             └─ global          全局包文件夹" >> $readmePath
+	echo "    └─ codeServer  svn 容器环境文件或应用配置文件" >> $readmePath
+	echo "    └─ frp         gitLab 容器环境文件或应用配置文件" >> $readmePath
+	echo "    └─ gitLab      svn 容器环境文件或应用配置文件" >> $readmePath
+	echo "    └─ noVnc       gitLab 容器环境文件或应用配置文件" >> $readmePath
+	echo "    └─ svn         svn 容器环境文件或应用配置文件" >> $readmePath
+	echo "    └─ verdaccio   gitLab 容器环境文件或应用配置文件" >> $readmePath
+	echo "-----------------------------------------------------" >> $readmePath
 	echo "|-- .docker    本机 Docker 实例的镜像、容器、日志、数据卷等文件夹" >> $readmePath
 	echo "-----------------------------------------------------" >> $readmePath
-	echo "|-- .nginx      本机 Nginx 实例的配置文件集合" >> $readmePath
-	echo "   |-- conf          配置文件数据盘" >> $readmePath
-	echo "   |-- _letsencrypt  用于certBot 的校验文件存放文件夹" >> $readmePath
-	echo "-----------------------------------------------------" >> $readmePath
-	echo "|-- .db         本机数据库文件存储路径" >> $readmePath
-	echo "   |--  mongo         mongoDb 数据卷" >> $readmePath
-	echo "      |--  conf           配置文件夹" >> $readmePath
-	echo "      |-- data            数据文件夹" >> $readmePath
-	echo "   |--  mysql         mysqlDb 数据卷" >> $readmePath
-	echo "      |-- conf            配置文件夹" >> $readmePath
-	echo "      |-- data            数据文件夹" >> $readmePath
-	echo "   |--  postgres      postgresDb 数据卷" >> $readmePath
-	echo "      |-- conf            配置文件夹" >> $readmePath
-	echo "      |-- data            数据文件夹" >> $readmePath
-	echo "   |--  redis         redis 数据卷" >> $readmePath
-	echo "      |-- conf            配置文件夹" >> $readmePath
-	echo "      |-- data            数据文件夹" >> $readmePath
-	echo "   |--  meilisearch   meilisearch 全文搜索引擎数据盘" >> $readmePath
-	echo "      |-- conf            配置文件夹" >> $readmePath
-	echo "      |-- data            数据文件夹" >> $readmePath
+	echo "|-- .python     本机 python 数据卷" >> $readmePath
+	echo "    └─ v2.7              v2.7 版本卷" >> $readmePath
+	echo "    └─ v3.0              v3.0 版本卷" >> $readmePath
 	echo "-----------------------------------------------------" >> $readmePath
 	echo "|-- .logs       本机日志文件存储集合" >> $readmePath
-	echo "   |--  [工程名称]     工程日志" >> $readmePath
-	echo "   |--  mongo         mongoDb 日志" >> $readmePath
-	echo "   |--  mysql         mysqlDb 日志" >> $readmePath
-	echo "   |--  postgres      postgresDb 日志" >> $readmePath
-	echo "   |--  redis         redis 日志" >> $readmePath
-	echo "   |--  meilisearch   meilisearch 全文搜索引擎日志" >> $readmePath
+	echo "    └─ [工程名称]     工程日志" >> $readmePath
+	echo "    └─ nginx         nginx 日志" >> $readmePath
+	echo "    └─ db            数据库日志" >> $readmePath
+	echo "       └─ mongo           mongoDb 日志" >> $readmePath
+	echo "       └─ mysql           mysqlDb 日志" >> $readmePath
+	echo "       └─ postgres        postgresDb 日志" >> $readmePath
+	echo "       └─ redis           redis 日志" >> $readmePath
+	echo "       └─ meilisearch     meilisearch 全文搜索引擎日志" >> $readmePath
 	echo "-----------------------------------------------------" >> $readmePath
 	echo "|-- .backup     本机备份文件存储集合" >> $readmePath
-	echo "   |--  [工程名称]     工程备份" >> $readmePath
-	echo "   |--  mongo         mongoDb 备份" >> $readmePath
-	echo "   |--  mysql         mysqlDb 备份" >> $readmePath
-	echo "   |--  postgres      postgresDb 备份" >> $readmePath
-	echo "   |--  redis         redis 备份" >> $readmePath
-	echo "   |--  meilisearch   meilisearch 全文搜索引擎备份" >> $readmePath
-	echo "-----------------------------------------------------" >> $readmePath
-	echo "|-- .python     本机 python 数据卷" >> $readmePath
-	echo "   |--  v2.7              v2.7 版本卷" >> $readmePath
-	echo "   |--  v3.0              v3.0 版本卷" >> $readmePath
+	echo "    └─ [工程名称]     工程备份" >> $readmePath
+	echo "       └─ wwww     web 页面文件备份" >> $readmePath
+	echo "       └─ svr      后端服务文件备份" >> $readmePath
+	echo "       └─ source   源码文件备份" >> $readmePath
+	echo "       └─ design   设计文件备份" >> $readmePath
+	echo "    └─ nginx       nginx 备份" >> $readmePath
+	echo "    └─ db          数据库备份" >> $readmePath
+	echo "       └─ mongo           mongoDb 备份" >> $readmePath
+	echo "       └─ mysql           mysqlDb 备份" >> $readmePath
+	echo "       └─ postgres        postgresDb 备份" >> $readmePath
+	echo "       └─ redis           redis 备份" >> $readmePath
+	echo "       └─ meilisearch     meilisearch 全文搜索引擎备份" >> $readmePath
 	echo "-----------------------------------------------------" >> $readmePath
 	echo "|-- common      本机公共资源集文件夹" >> $readmePath
-	echo "   |--  .smpoo         深普品牌公共静态资源" >> $readmePath
+	echo "    └─ .smpoo         深普品牌公共静态资源" >> $readmePath
 	echo "-----------------------------------------------------" >> $readmePath
-	echo "|-- scricpt     本机运维脚本文件夹" >> $readmePath
+	echo "|-- scricpt     本机公用的运维脚本文件夹" >> $readmePath
 	echo "-----------------------------------------------------" >> $readmePath
 	echo "|-- tools       本机工具应用文件夹" >> $readmePath
-	echo "   |-- codeServer     基于 vscode 的 codeServer 服务文件夹" >> $readmePath
-	echo "   |-- frp            基于 frp 的内网穿透服务文件夹" >> $readmePath
-	echo "   |-- gitLab         基于 gitLab 的私有 git 服务文件夹" >> $readmePath
-	echo "   |-- noVnc          基于 noVnc 的 web 浏览器远程桌面服务文件夹" >> $readmePath
-	echo "   |-- svn            私有 svn 服务文件夹" >> $readmePath
-	echo "   |-- verdaccio      基于 Verdaccio 的私有 npm 库服务文件夹" >> $readmePath
+	echo "   └─ codeServer     基于 vscode 的 codeServer 服务文件夹" >> $readmePath
+	echo "   └─ frp            基于 frp 的内网穿透服务文件夹" >> $readmePath
+	echo "   └─ gitLab         基于 gitLab 的私有 git 服务文件夹" >> $readmePath
+	echo "   └─ noVnc          基于 noVnc 的 web 浏览器远程桌面服务文件夹" >> $readmePath
+	echo "   └─ svn            私有 svn 服务文件夹" >> $readmePath
+	echo "   └─ verdaccio      基于 Verdaccio 的私有 npm 库服务文件夹" >> $readmePath
 	echo "-----------------------------------------------------" >> $readmePath
 	echo "|-- project/[工程]    本机工程文件夹" >> $readmePath
-	echo "   |-- .env           工程配置文件夹" >> $readmePath
-	echo "      |-- nginx                工程级 nginx 资产文件夹" >> $readmePath
-	echo "      |-- .nodeGlobal 工程级 NodeJs 全局库文件夹（匹配 NodeJs版本、python版本、）" >> $readmePath
-	echo "         |--  bin           nodeJs 全局库的 bin 文件，npm/yarn/pnpm 公用" >> $readmePath
-	echo "         |--  npmRepo       基于 Npm 的全局库" >> $readmePath
-	echo "            |-- cache           缓存文件夹" >> $readmePath
-	echo "            |-- global          全局包文件夹" >> $readmePath
-	echo "         |--  yarnRepo      基于 Yarn 的全局库" >> $readmePath
-	echo "            |-- cache           缓存文件夹" >> $readmePath
-	echo "            |-- global          全局包文件夹" >> $readmePath
-	echo "            |-- link            全局链接文件夹" >> $readmePath
-	echo "            |-- offlinel        全局离线缓存文件夹" >> $readmePath
-	echo "         |--  pnpmRepo      基于 Pnpm 的全局库" >> $readmePath
-	echo "            |-- cache           缓存文件夹" >> $readmePath
-	echo "            |-- global          全局包文件夹" >> $readmePath
-	echo "   |-- data           工程数据文件夹" >> $readmePath
-	echo "   |-- dockerFile     工程 dockerFile 文件夹" >> $readmePath
-	echo "      |-- base                 基础镜像" >> $readmePath
-	echo "      |-- biz                  业务镜像" >> $readmePath
-	echo "      |-- tools                工具镜像" >> $readmePath
-	echo "   |-- html           工程 web 文件夹" >> $readmePath
-	echo "      |-- docs                 工程文档文件夹" >> $readmePath
-	echo "      |-- files                工程上传下载的静态文件夹" >> $readmePath
-	echo "      |-- www                  主 web 根文件夹" >> $readmePath
-	echo "   |-- nodePj         工程内 nodeJs 程序文件夹" >> $readmePath
-	echo "      |-- node_modules         工程内 nodeJs 库数据卷" >> $readmePath
-	echo "      |-- space                monoRepo 文件夹" >> $readmePath
-	echo "      |-- pnpm-workspace.yaml  monoRepo 配置文件" >> $readmePath
+	echo "   └─ data           工程数据文件夹" >> $readmePath
+	echo "   └─ dockerFile     工程 dockerFile 文件夹" >> $readmePath
+	echo "       └─ base                 基础镜像" >> $readmePath
+	echo "       └─ biz                  业务镜像" >> $readmePath
+	echo "       └─ tools                工具镜像" >> $readmePath
+	echo "   └─ html           工程 web 文件夹" >> $readmePath
+	echo "       └─ docs                 工程文档文件夹" >> $readmePath
+	echo "       └─ files                工程上传下载的静态文件夹" >> $readmePath
+	echo "       └─ www                  主 web 根文件夹" >> $readmePath
+	echo "   └─ nodePj         工程内 nodeJs 程序文件夹" >> $readmePath
+	echo "       └─ node_modules         工程内 nodeJs 库数据卷" >> $readmePath
+	echo "       └─ space                monoRepo 文件夹" >> $readmePath
+	echo "       └─ pnpm-workspace.yaml  monoRepo 配置文件" >> $readmePath
+	echo "   └─ scricpt        仅本工程可用的脚本文件夹" >> $readmePath
 	echo "" >> $readmePath
 	echo "---" >> $readmePath
 	echo -e "## 服务器可放行端口列表\n以下列表仅代表该服务器可能允许的端口，具体是否开放，由服务启动时自动管理" >> $readmePath
@@ -245,19 +260,31 @@ function preparePath() {
 	if [ "$isDone" != "y" ]; then
 		dbTypes=(mongo mysql postgres redis meilisearch)
 
-		cd $ROOT_PATH
 		# 在首次初始化时初始化根目录
-		mkdir -pv .backup .db .docker .logs .nginx/{conf,_letsencrypt} .python/{v2.7,v3.0} common/.smpoo project scricpt tools
-		# docker
-		# nginx
-		# db
-		cd $ROOT_PATH/.db
+		mkdir -pv $ROOT_PATH/.env/{nginx/{cert,conf,_letsencrypt},db,nodeGlobal,codeServer,frp,gitLab,noVnc,svn,verdaccio}
+		mkdir -pv $ROOT_PATH/.docker
+		mkdir -pv $ROOT_PATH/.python/{v2.7,v3.0}
+		mkdir -pv $ROOT_PATH/.logs/{nginx,db}
+		mkdir -pv $ROOT_PATH/.backup/{nginx,db}
+		mkdir -pv $ROOT_PATH/common/.smpoo
+		mkdir -pv $ROOT_PATH/project
+		mkdir -pv $ROOT_PATH/scricpt
+		mkdir -pv $ROOT_PATH/tools/{codeServer,frp,gitLab,noVnc,svn,verdaccio}
+
+		# DB
 		for ((i=0;i<${#dbTypes[*]};i++))
 		do
-			mkdir -pv $ROOT_PATH/.db/${dbTypes[$i]}/{conf,data}
+			mkdir -pv $ROOT_PATH/.env/db/${dbTypes[$i]}/{conf,data}
 		done
+
+		# nodeJs 全局
+		nodeVers=(v12 v14 v16 v18)
+		for ((i=0;i<${#nodeVers[*]};i++))
+		do
+			mkdir -pv $ROOT_PATH/.env/.nodeGlobal/${nodeVers[$i]}/{bin,npmRepo/{cache,global},pnpmRepo/{cache,global},yarnRepo/{cache,globa,link,offlinel}}
+		done
+
 		# 日志
-		cd $ROOT_PATH/.logs
 		mkdir -pv nginx
 		for ((i=0;i<${#dbTypes[*]};i++))
 		do
@@ -265,16 +292,12 @@ function preparePath() {
 		done
 
 		# 备份
-		cd $ROOT_PATH/.backup
 		mkdir -pv nginx
 		for ((i=0;i<${#dbTypes[*]};i++))
 		do
 			mkdir -pv $ROOT_PATH/.backup/db/${dbTypes[$i]}
 		done
 
-		# 工具
-		cd $ROOT_PATH/tools
-		mkdir -pv codeServer frp gitLab noVnc svn verdaccio
 		# 公共资源集
 		chmod 777 $ROOT_PATH/common
 		# 工程文件夹
@@ -286,19 +309,13 @@ function preparePath() {
 		createSvrDoc
 	fi
 
-	cd $ROOT_PATH
-	mkdir -pv project/$PROJECT_NAME .logs/$PROJECT_NAME .backup/$PROJECT_NAME
+	mkdir -pv $ROOT_PATH/.logs/$PROJECT_NAME $ROOT_PATH/.backup/$PROJECT_NAME
 
-	cd $ROOT_PATH/project/$PROJECT_NAME
-	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/{.env/{nginx/cert,.nodeGlobal},data,dockerFile,html/{docs,files,www},nodePj/{node_modules,space}}
-
-	# nodeJs 全局
-	cd $ROOT_PATH/project/$PROJECT_NAME/.env/.nodeGlobal
-	nodeVers=(v12 v14 v16 v18)
-	for ((i=0;i<${#nodeVers[*]};i++))
-	do
-		mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/.env/.nodeGlobal/${dbTypes[$i]}/{bin,npmRepo/{cache,global},pnpmRepo/{cache,global},yarnRepo/{cache,globa,link,offlinel}}
-	done
+	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/data
+	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/dockerFile
+	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/html/{docs,files,www}
+	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/nodePj/{node_modules,space}
+	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/scricpt
 
 	stepDone "目录结构初始化"
 }

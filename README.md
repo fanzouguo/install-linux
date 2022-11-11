@@ -7,20 +7,20 @@ tFrame工程脚本集合
 ### 初始化 Linux 服务器
 > #### 推荐：(避免防火墙干扰，下载即安装)
 ```shell
-sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@21.2.1/script/init.sh -O -)"
+sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@21.3.0/script/init.sh -O -)"
 ```
 > #### 或基于 github 该脚本文件的 raw 连接
 ```shell
-sh -c "$(wget https://github.com/fanzouguo/install-linux/raw/v21.2.1/script/install.sh -O -)"
+sh -c "$(wget https://github.com/fanzouguo/install-linux/raw/v21.3.0/script/install.sh -O -)"
 ```
 > #### 或：
 ```shell
-curl -o- https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@21.2.1/script/init.sh | bash
+curl -o- https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@21.3.0/script/init.sh | bash
 ```
 
 > #### 也可以在初始化时，传入项目名称，项目名称缺省为：tcoffe
 ```shell
-wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@21.2.1/script/init.sh | sh [项目名称]
+wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@21.3.0/script/init.sh | sh [项目名称]
 ```
 
 ## 工作空间结构

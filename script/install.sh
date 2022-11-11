@@ -463,6 +463,8 @@ function baseDefense() {
 	# 更改默认端口：22、3306、5432
 
 	chmod 700 /root/.ssh
+	chmod 700 $ROOT_PATH/project/$PROJECT_NAME
+	chmod 777 $ROOT_PATH
 	echo ""
 }
 # 显示安装报告

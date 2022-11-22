@@ -11,7 +11,7 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="24.0.0"
+scricptVer="24.1.0"
 
 # 本系统默认允许的端口
 # 前端服务端口：80 443 8080
@@ -296,10 +296,15 @@ function installDocker() {
 	systemctl start docker
 
 	# 安装 docker-compose
+	# sudo curl -L https://get.daocloud.io/docker/compose/releases/download/v2.12.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 	# wget "https://hub.fastgit.org/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose
-	cd /usr/local/bin
-	wget "https://hub.fastgit.org/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64"
-	mv /usr/local/bin/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose
+
+	wget "https://get.daocloud.io/docker/compose/releases/download/v2.12.2/docker-compose-`uname -s`-`uname -m`" -o /usr/local/bin/docker-compose
+
+	# cd /usr/local/bin
+	# wget "https://hub.fastgit.org/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64"
+
+	# mv /usr/local/bin/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose
 	chmod +x /usr/local/bin/docker-compose
 
 	docker -v

@@ -49,8 +49,9 @@ const setVer = async () => {
 };
 
 /** 获取 README.md 文件的版本替换值 */
-const strReplaceReadMe1 = verStr => `/install-linux@${verStr}/script/init.sh`;
+const strReplaceReadMe1 = verStr => `/install-linux@${verStr}/script/install.sh`;
 const strReplaceReadMe2 = verStr => `/install-linux/raw/v${verStr}/script`;
+const strReplaceReadMe3 = verStr => `/releases/download/v${verStr}/install.sh`;
 /** 获取主脚本文件：install.sh 的版本替换值 */
 const strReplaceMain = verStr => `scricptVer="${verStr}"`;
 const updateReadme = async (verOld, verNew) => {
@@ -60,7 +61,8 @@ const updateReadme = async (verOld, verNew) => {
 	});
 	const regStr1 = new RegExp(strReplaceReadMe1(verOld), 'g');
 	const regStr2 = new RegExp(strReplaceReadMe2(verOld), 'g');
-	const fileData = readmeFileStr.replace(regStr1, strReplaceReadMe1(verNew)).replace(regStr2, strReplaceReadMe2(verNew));
+	const regStr3 = new RegExp(strReplaceReadMe3(verOld), 'g');
+	const fileData = readmeFileStr.replace(regStr1, strReplaceReadMe1(verNew)).replace(regStr2, strReplaceReadMe2(verNew)).replace(regStr3, strReplaceReadMe3(verNew));
 	fs.writeFile(pathReadme, fileData);
 };
 

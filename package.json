@@ -1,6 +1,6 @@
 {
   "name": "install-linux",
-  "version": "22.0.1",
+  "version": "24.0.0",
   "description": "The unattended watching shell script for fast install the linux server.",
   "private": true,
   "main": "",

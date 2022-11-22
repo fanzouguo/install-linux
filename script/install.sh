@@ -11,7 +11,7 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="22.0.1"
+scricptVer="24.0.0"
 
 # 本系统默认允许的端口
 # 前端服务端口：80 443 8080
@@ -143,11 +143,10 @@ function preparePath() {
 		dbTypes=(mongo mysql postgres redis meilisearch)
 
 		# 在首次初始化时初始化根目录
-		mkdir -pv $ROOT_PATH/.env/{nginx/{cert,conf,_letsencrypt},db,nodeGlobal,codeServer,frp,gitLab,noVnc,svn,verdaccio}
-		mkdir -pv $ROOT_PATH/.docker
-		mkdir -pv $ROOT_PATH/.python/{v2.7,v3.0}
-		mkdir -pv $ROOT_PATH/.logs/{nginx,db}
-		mkdir -pv $ROOT_PATH/.backup/{nginx,db}
+		mkdir -pv $ROOT_PATH/.env/{nginx/{cert,conf,_letsencrypt},db,nodeGlobal,codeServer,frp,gitLab,noVnc,svn/repo,verdaccio}
+		mkdir -pv $ROOT_PATH/docker
+		mkdir -pv $ROOT_PATH/logs/{nginx,db}
+		mkdir -pv $ROOT_PATH/backup/{nginx,db}
 		mkdir -pv $ROOT_PATH/common/.smpoo
 		mkdir -pv $ROOT_PATH/project
 		mkdir -pv $ROOT_PATH/scricpt
@@ -160,24 +159,24 @@ function preparePath() {
 		done
 
 		# nodeJs 全局
-		nodeVers=(v12 v14 v16 v18)
+		nodeVers=(haya tmind tcoffe)
 		for ((i=0;i<${#nodeVers[*]};i++))
 		do
-			mkdir -pv $ROOT_PATH/.env/.nodeGlobal/${nodeVers[$i]}/{bin,npmRepo/{cache,global},pnpmRepo/{cache,global},yarnRepo/{cache,globa,link,offlinel}}
+			mkdir -pv $ROOT_PATH/.env/nodeGlobal/${nodeVers[$i]}/{npmRepo/{cache,global},pnpmRepo/{cache,global,store},yarnRepo/{cache,globa,link,offlinel}}
 		done
 
 		# 日志
 		mkdir -pv nginx
 		for ((i=0;i<${#dbTypes[*]};i++))
 		do
-			mkdir -pv $ROOT_PATH/.logs/db/${dbTypes[$i]}
+			mkdir -pv $ROOT_PATH/logs/db/${dbTypes[$i]}
 		done
 
 		# 备份
 		mkdir -pv nginx
 		for ((i=0;i<${#dbTypes[*]};i++))
 		do
-			mkdir -pv $ROOT_PATH/.backup/db/${dbTypes[$i]}
+			mkdir -pv $ROOT_PATH/backup/db/${dbTypes[$i]}
 		done
 
 		# 公共资源集
@@ -190,7 +189,7 @@ function preparePath() {
 		chmod 777 $ROOT_PATH/tools
 	fi
 
-	mkdir -pv $ROOT_PATH/.logs/$PROJECT_NAME $ROOT_PATH/.backup/$PROJECT_NAME
+	mkdir -pv $ROOT_PATH/logs/$PROJECT_NAME $ROOT_PATH/backup/$PROJECT_NAME
 
 	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/data
 	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/dockerFile
@@ -250,8 +249,10 @@ function preInstall() {
 	cd ~
 	wget https://dev.mysql.com/get/mysql80-community-release-el8-1.noarch.rpm
 	rpm -ivh mysql80-community-release-el8-1.noarch.rpm
+	# 全局安装基本依赖库
+	yum install -y createrepo curl-devel expect expat-devel gcc gcc-c++ gettext-devel glibc-common holland-mysqldump.noarch kernel-devel libevent-devel libxml2-devel jansson-devel m4 make ncurses-devel openssl-devel perl-ExtUtils-MakeMaker SDL tcl tcl-devel unixODBC unixODBC-devel zlib-devel
 	# 全局安装基本组件
-	yum install -y git vim curl telnet telnet-server openssl-devel kernel-devel createrepo holland-mysqldump.noarch expect gcc gcc-c++ libevent-devel libxml2-devel jansson-devel m4 make ncurses-devel SDL tcl tcl-devel unixODBC unixODBC-devel glibc-common
+	yum install -y  curl git subversion telnet telnet-server vim
 	#
 
 	stepDone "系统环境预安装"
@@ -289,11 +290,20 @@ function installDocker() {
 	# 修改镜像存储位置
 	touch /etc/docker/daemon.json
 	echo "{" >> /etc/docker/daemon.json
-	echo "\"data-root\": \"/$ROOT_PATH/.docker\"" >> /etc/docker/daemon.json
+	echo "\"data-root\": \"/$ROOT_PATH/docker\"" >> /etc/docker/daemon.json
 	echo "}" >> /etc/docker/daemon.json
 	systemctl start docker.socket
 	systemctl start docker
+
+	# 安装 docker-compose
+	# wget "https://hub.fastgit.org/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose
+	cd /usr/local/bin
+	wget "https://hub.fastgit.org/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64"
+	mv /usr/local/bin/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose
+	chmod +x /usr/local/bin/docker-compose
+
 	docker -v
+	docker-compose --version
 
 	stepDone "Docker 安装"
 }

@@ -1,0 +1,121 @@
+# 文件夹说明
+---
+
+## 文档结构
+|-- .env       本机所有项目及公共配置文件夹
+    └─ nginx       本机 Nginx 容器环境文件或应用配置文件
+       └─ cert         nginx 容器的 SSL 证书文件夹
+       └─ conf         配置文件数据盘
+       └─ _letsencrypt 用于certBot 的校验文件存放文件夹
+    └─ db          本机数据存容器环境文件或应用配置文件
+       └─ mongo        mongoDb 数据卷
+          └─ conf           配置文件夹
+          └─ data            数据文件夹
+       └─ mysql        mysqlDb 数据卷
+          └─ conf            配置文件夹
+          └─ data            数据文件夹
+       └─ postgres     postgresDb 数据卷
+          └─ conf            配置文件夹
+          └─ data            数据文件夹
+       └─ redis        redis 数据卷
+          └─ conf            配置文件夹
+          └─ data            数据文件夹
+       └─ meilisearch  meilisearch 全文搜索引擎数据盘
+          └─ conf            配置文件夹
+          └─ data            数据文件夹
+    └─ .nodeGlobal 工程级 NodeJs 全局库文件夹（匹配 NodeJs版本、python版本、）
+       └─ (12/14/16/18) nodeJs 全局库的 bin 文件，npm/yarn/pnpm 公用
+          └─ bin             nodeJs 全局库的 bin 文件，npm/yarn/pnpm 公用
+          └─ npmRepo         基于 Npm 的全局库
+             └─ cache           缓存文件夹
+             └─ global          全局包文件夹
+          └─ yarnRepo        基于 Yarn 的全局库
+             └─ cache           缓存文件夹
+             └─ global          全局包文件夹
+             └─ link            全局链接文件夹
+             └─ offlinel        全局离线缓存文件夹
+          └─ pnpmRepo        基于 Pnpm 的全局库
+             └─ cache           缓存文件夹
+             └─ global          全局包文件夹
+    └─ codeServer  svn 容器环境文件或应用配置文件
+    └─ frp         gitLab 容器环境文件或应用配置文件
+    └─ gitLab      svn 容器环境文件或应用配置文件
+    └─ noVnc       gitLab 容器环境文件或应用配置文件
+    └─ svn         svn 容器环境文件或应用配置文件
+    └─ verdaccio   gitLab 容器环境文件或应用配置文件
+-----------------------------------------------------
+|-- .docker    本机 Docker 实例的镜像、容器、日志、数据卷等文件夹
+-----------------------------------------------------
+|-- .python     本机 python 数据卷
+    └─ v2.7              v2.7 版本卷
+    └─ v3.0              v3.0 版本卷
+-----------------------------------------------------
+|-- .logs       本机日志文件存储集合
+    └─ [工程名称]     工程日志
+    └─ nginx         nginx 日志
+    └─ db            数据库日志
+       └─ mongo           mongoDb 日志
+       └─ mysql           mysqlDb 日志
+       └─ postgres        postgresDb 日志
+       └─ redis           redis 日志
+       └─ meilisearch     meilisearch 全文搜索引擎日志
+-----------------------------------------------------
+|-- .backup     本机备份文件存储集合
+    └─ [工程名称]     工程备份
+       └─ wwww     web 页面文件备份
+       └─ svr      后端服务文件备份
+       └─ source   源码文件备份
+       └─ design   设计文件备份
+    └─ nginx       nginx 备份
+    └─ db          数据库备份
+       └─ mongo           mongoDb 备份
+       └─ mysql           mysqlDb 备份
+       └─ postgres        postgresDb 备份
+       └─ redis           redis 备份
+       └─ meilisearch     meilisearch 全文搜索引擎备份
+-----------------------------------------------------
+|-- common      本机公共资源集文件夹
+    └─ .smpoo         深普品牌公共静态资源
+-----------------------------------------------------
+|-- scricpt     本机公用的运维脚本文件夹
+-----------------------------------------------------
+|-- tools       本机工具应用文件夹
+   └─ codeServer     基于 vscode 的 codeServer 服务文件夹
+   └─ frp            基于 frp 的内网穿透服务文件夹
+   └─ gitLab         基于 gitLab 的私有 git 服务文件夹
+   └─ noVnc          基于 noVnc 的 web 浏览器远程桌面服务文件夹
+   └─ svn            私有 svn 服务文件夹
+   └─ verdaccio      基于 Verdaccio 的私有 npm 库服务文件夹
+-----------------------------------------------------
+|-- project/[工程]    本机工程文件夹
+   └─ data           工程数据文件夹
+   └─ dockerFile     工程 dockerFile 文件夹
+       └─ base                 基础镜像
+       └─ biz                  业务镜像
+       └─ tools                工具镜像
+   └─ html           工程 web 文件夹
+       └─ docs                 工程文档文件夹
+       └─ files                工程上传下载的静态文件夹
+       └─ www                  主 web 根文件夹
+   └─ nodePj         工程内 nodeJs 程序文件夹
+       └─ node_modules         工程内 nodeJs 库数据卷
+       └─ space                monoRepo 文件夹
+       └─ pnpm-workspace.yaml  monoRepo 配置文件
+   └─ scricpt        仅本工程可用的脚本文件夹
+
+---
+## 服务器可放行端口列表
+以下列表仅代表该服务器可能允许的端口，具体是否开放，由服务启动时自动管理
+* ### 前端服务端口：80 443 8080 9999
+* ### PC端程序后端服务端口：3000 3001 3002 3003 3004 3005 3006 3007 3008 3009
+* ### 微信小程序后端服务端口：4100 4101 4102 4103
+* ### 飞书应用后端服务端口：5100 5101 5102 5103 [应避免使用 5000 端口-(blazer5 木马 和 Troie ）]
+* ### 业务接口端口：3999
+* ### 微信机器人端口：4999
+* ### 飞书机器人端口：5999
+* ### Mysql 数据库接口：3306
+* ### MongoDb 数据库接口 27017 28017
+* ### SVN 接口 3690
+* ### gitLab 新端口 8888
+* ### NodeJs 项目远程调试端口 9229
+* ### Cockpit WEB 端管理页面端口 9090

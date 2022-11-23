@@ -11,7 +11,9 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="25.0.0"
+scricptVer="26.0.0"
+# Docker-compose 是否安装成功
+dockerComposeIsOk=""
 
 # 本系统默认允许的端口
 # 前端服务端口：80 443 8080
@@ -179,14 +181,18 @@ function preparePath() {
 			mkdir -pv $ROOT_PATH/backup/db/${dbTypes[$i]}
 		done
 
+		# 备份文件夹
+		chmod -R 777 $ROOT_PATH/backup
 		# 公共资源集
-		chmod 777 $ROOT_PATH/common
+		chmod -R 777 $ROOT_PATH/common
+		# 日志文件夹
+		chmod -R 777 $ROOT_PATH/logs
 		# 工程文件夹
-		chmod 777 $ROOT_PATH/project
+		chmod -R 777 $ROOT_PATH/project
 		# 运维脚本集
-		chmod 777 $ROOT_PATH/scricpt
-		# 运维脚本集
-		chmod 777 $ROOT_PATH/tools
+		chmod -R 777 $ROOT_PATH/scricpt
+		# 运维工具集
+		chmod -R 777 $ROOT_PATH/tools
 	fi
 
 	mkdir -pv $ROOT_PATH/logs/$PROJECT_NAME $ROOT_PATH/backup/$PROJECT_NAME
@@ -296,20 +302,19 @@ function installDocker() {
 	systemctl start docker
 
 	# 安装 docker-compose
-	# sudo curl -L https://get.daocloud.io/docker/compose/releases/download/v2.12.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-	# wget "https://hub.fastgit.org/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose
+	wget "https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-`uname -s`-`uname -m`" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
 
-	wget "https://get.daocloud.io/docker/compose/releases/download/v2.12.2/docker-compose-`uname -s`-`uname -m`" -o /usr/local/bin/docker-compose
-
-	# cd /usr/local/bin
-	# wget "https://hub.fastgit.org/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64"
-
-	# mv /usr/local/bin/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose
-	chmod +x /usr/local/bin/docker-compose
-
-	docker -v
-	docker-compose --version
-
+	if [ -f /usr/local/bin/docker-compose ]; then
+		dcVerCkb=`docker-compose --version`
+		if [ "$dcVerCkb" == "Docker Compose version v*" ]; then
+			dockerComposeIsOk="true"
+			chmod +x /usr/local/bin/docker-compose
+		else
+			dockerComposeIsOk=""
+		fi
+	else
+		dockerComposeIsOk=""
+	fi
 	stepDone "Docker 安装"
 }
 # 安装 cockpit
@@ -385,6 +390,24 @@ function getReport() {
 	showSucc 资源包
 	ls -laF /$ROOT_PATH/common/.smpoo
 	cd ~
+	showSucc "Docker 及组件"
+	docker -v
+	docker-compose --version
+	cd ~
+
+	if [ "$dockerComposeIsOk" == "" ]; then
+		echo ""
+		echo ""
+		showLine
+		showErr "docker-compose 安装失败，请手工执行以下操作："
+		echo "cd /usr/local/bin"
+		echo -e "wget \"https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-\`uname -s\`-\`uname -m\`\""
+		echo -e "mv docker-compose-\`uname -s\`-\`uname -m\` docker-compose"
+		echo "chmod +x /usr/local/bin/docker-compose"
+		echo "***************"
+		echo "执行：docker-compose --version 检查是否安装成功"
+		echo -e "\n\n"
+	fi
 }
 # 执行安装
 function fullInstall() {

@@ -11,7 +11,7 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="26.1.0"
+scricptVer="26.2.0"
 # Docker-compose 是否安装成功
 dockerComposeIsOk=""
 
@@ -143,21 +143,27 @@ function preparePath() {
 	mkdir -p $ROOT_PATH
 	if [ "$isDone" != "y" ]; then
 		dbTypes=(mongo mysql postgres redis meilisearch minio)
+		toolsType=(codeServer firefoxSend frp gitLab noVnc svn verdaccio)
 
 		# 在首次初始化时初始化根目录
-		mkdir -pv $ROOT_PATH/.env/{nginx/{cert,conf,_letsencrypt},db,nodeGlobal,codeServer,frp,gitLab,noVnc,svn/repo,verdaccio}
+		mkdir -pv $ROOT_PATH/.env/{nginx/{cert,conf,_letsencrypt},db,nodeGlobal,svn/repo}
 		mkdir -pv $ROOT_PATH/docker
 		mkdir -pv $ROOT_PATH/logs/{nginx,db}
 		mkdir -pv $ROOT_PATH/backup/{nginx,db}
 		mkdir -pv $ROOT_PATH/common/.smpoo
 		mkdir -pv $ROOT_PATH/project
 		mkdir -pv $ROOT_PATH/scricpt
-		mkdir -pv $ROOT_PATH/tools/{codeServer,frp,gitLab,noVnc,svn,verdaccio}
 
 		# DB
 		for ((i=0;i<${#dbTypes[*]};i++))
 		do
 			mkdir -pv $ROOT_PATH/.env/db/${dbTypes[$i]}/{conf,data}
+		done
+
+		# Tools
+		for ((i=0;i<${#toolsType[*]};i++))
+		do
+			mkdir -pv $ROOT_PATH/.env/${dbTypes[$i]}/{conf,data}
 		done
 
 		# nodeJs 全局

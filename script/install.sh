@@ -11,7 +11,7 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="26.0.0"
+scricptVer="26.1.0"
 # Docker-compose 是否安装成功
 dockerComposeIsOk=""
 
@@ -142,7 +142,7 @@ function preparePath() {
 
 	mkdir -p $ROOT_PATH
 	if [ "$isDone" != "y" ]; then
-		dbTypes=(mongo mysql postgres redis meilisearch)
+		dbTypes=(mongo mysql postgres redis meilisearch minio)
 
 		# 在首次初始化时初始化根目录
 		mkdir -pv $ROOT_PATH/.env/{nginx/{cert,conf,_letsencrypt},db,nodeGlobal,codeServer,frp,gitLab,noVnc,svn/repo,verdaccio}

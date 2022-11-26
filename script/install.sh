@@ -11,7 +11,7 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="26.3.0"
+scricptVer="26.4.0"
 # Docker-compose 是否安装成功
 dockerComposeIsOk=""
 
@@ -170,7 +170,7 @@ function preparePath() {
 		nodeVers=(haya tmind tcoffe)
 		for ((i=0;i<${#nodeVers[*]};i++))
 		do
-			mkdir -pv $ROOT_PATH/.env/nodeGlobal/${nodeVers[$i]}/{npmRepo/{cache,global},pnpmRepo/{cache,global,store},yarnRepo/{cache,global,link,offlinel}}
+			mkdir -pv $ROOT_PATH/.env/nodeGlobal/${nodeVers[$i]}/{npmRepo/{cache,global},pnpmRepo/{cache,global,store},yarnRepo/{cache,global,link,offline}}
 		done
 
 		# 日志

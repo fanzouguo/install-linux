@@ -7,15 +7,15 @@ tFrame工程脚本集合
 ### 初始化 Linux 服务器
 > #### 推荐：(避免防火墙干扰，下载即安装)
 ```shell
-sh -c "$(wget https://github.com/fanzouguo/install-linux/releases/download/v26.2.0/install.sh -O -)"
+sh -c "$(wget https://github.com/fanzouguo/install-linux/releases/download/v26.3.0/install.sh -O -)"
 ```
 
 ```shell
-sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@26.2.0/script/install.sh -O -)"
+sh -c "$(wget https://cdn.jsdelivr.net/gh/fanzouguo/install-linux@26.3.0/script/install.sh -O -)"
 ```
 > #### 或基于 github 该脚本文件的 raw 连接
 ```shell
-sh -c "$(wget https://github.com/fanzouguo/install-linux/raw/v26.2.0/script/install.sh -O -)"
+sh -c "$(wget https://github.com/fanzouguo/install-linux/raw/v26.3.0/script/install.sh -O -)"
 ```
 > #### 或：
 ```shell

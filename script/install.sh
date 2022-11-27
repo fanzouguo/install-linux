@@ -11,7 +11,7 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="26.4.0"
+scricptVer="27.0.0"
 # Docker-compose 是否安装成功
 dockerComposeIsOk=""
 
@@ -163,31 +163,29 @@ function preparePath() {
 		# Tools
 		for ((i=0;i<${#toolsType[*]};i++))
 		do
-			mkdir -pv $ROOT_PATH/.env/${dbTypes[$i]}/{conf,data}
+			mkdir -pv $ROOT_PATH/.env/${toolsType[$i]}/{conf,data}
 		done
 
 		# nodeJs 全局
 		nodeVers=(haya tmind tcoffe)
 		for ((i=0;i<${#nodeVers[*]};i++))
 		do
-			mkdir -pv $ROOT_PATH/.env/nodeGlobal/${nodeVers[$i]}/{npmRepo/{cache,global},pnpmRepo/{cache,global,store},yarnRepo/{cache,global,link,offline}}
+			mkdir -pv $ROOT_PATH/.env/nodeGlobal/${nodeVers[$i]}/{npmRepo/{cache,global},pnpmRepo/{cache,global,.store},yarnRepo/{cache,global,link,offline}}
 		done
 
-		# 日志
-		mkdir -pv nginx
+		# 日志/db/foo
 		for ((i=0;i<${#dbTypes[*]};i++))
 		do
 			mkdir -pv $ROOT_PATH/logs/db/${dbTypes[$i]}
 		done
 
-		# 备份
-		mkdir -pv nginx
+		# 备份/db/foo
 		for ((i=0;i<${#dbTypes[*]};i++))
 		do
 			mkdir -pv $ROOT_PATH/backup/db/${dbTypes[$i]}
 		done
 
-		# 备份文件夹
+		# 对文件夹进行备份
 		chmod -R 777 $ROOT_PATH/backup
 		# 公共资源集
 		chmod -R 777 $ROOT_PATH/common

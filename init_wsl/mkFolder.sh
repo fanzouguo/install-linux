@@ -80,14 +80,13 @@ function initFolder() {
 	done
 
 	# 日志
-	mkdir -pv nginx
+	cd /
 	for dbItem in $dbTypes1 $dbTypes2 $dbTypes3 $dbTypes4 $dbTypes5 $dbTypes6;
 	do
 		mkdir -pv $ROOT_PATH/logs/db/$dbItem
 	done
 
 	# 备份
-	mkdir -pv nginx
 	for dbItem in $dbTypes1 $dbTypes2 $dbTypes3 $dbTypes4 $dbTypes5 $dbTypes6;
 	do
 		mkdir -pv $ROOT_PATH/backup/db/$dbItem

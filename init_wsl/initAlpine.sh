@@ -24,18 +24,19 @@ if [ "$isDone" == "n" ]; then
 	echo -e "alias clear='/bin/sh /root/.clear.sh'" >> /root/.bashrc
 	echo -e "alias ll='ls -laF'" >> /root/.bashrc
 	source /root/.bashrc
-	# 更换中科源
+	# 更换中科大源
 	sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 	#安装tzdata
-	apk update && apk add --no-cache tzdata
-	#拷贝时区文件
-	cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-	#指定时区
-	echo "Asia/Shanghai" > /etc/timezone
-	#移除时区文件(指定完时区就可以删除了)
-	apk del tzdata
-	#查看时间及时区
-	date -R
+	apk update
+	# apk add tzdata
+	# #拷贝时区文件
+	# cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+	# #指定时区
+	# echo "Asia/Shanghai" > /etc/timezone
+	# #移除时区文件(指定完时区就可以删除了)
+	# apk del tzdata
+	# #查看时间及时区
+	# date -R
 
 	setDone
 	isDone="y"

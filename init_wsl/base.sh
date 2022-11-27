@@ -10,17 +10,39 @@ ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk 
 
 # 检查 WSL 服务器是否已完成初始化
 function checkDone() {
-	if [ -e $ROOT_PATH/.smpooInitDone ]; then
+	checkFile=""
+	if [ "$1" == "alpine" ]; then
+		checkFile=$ROOT_PATH/.alpineDone
+	elif [ "$1" == "ubuntu" ]; then
+		checkFile=$ROOT_PATH/.ubuntuDone
+	fi
+
+	if [ ! -n "$checkFile" ]; then
 		echo "y"
 	else
-		echo "n"
+		if [ -e $checkFile ]; then
+			echo "y"
+		else
+			echo "n"
+		fi
 	fi
 }
 # 设置 WSL 服务器为已初始化状态
 function setDone() {
 	showSucc "安装已全部完成!"
-	echo "$EXEC_DATE 执行服务器初始化" >> $ROOT_PATH/.smpooInitDone
-	chmod 444 $ROOT_PATH/.smpooInitDone
+
+	checkFile=""
+	if [ "$1" == "alpine" ]; then
+		checkFile=$ROOT_PATH/.alpineDone
+	elif [ "$1" == "ubuntu" ]; then
+		checkFile=$ROOT_PATH/.ubuntuDone
+	fi
+
+	if [ -n "$checkFile" ]; then
+		echo "$EXEC_DATE 执行服务器初始化" >> $checkFile
+		chmod 444 $checkFile
+	fi
+
 	echo ""
 }
 

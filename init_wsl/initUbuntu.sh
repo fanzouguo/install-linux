@@ -9,7 +9,7 @@ function getUbuntuInfo() {
 	echo "Ubuntu 22.04.1 LTS"
 }
 # 服务宿主机已初始化
-isDone=`checkDone`
+isDone=`checkDone "ubuntu"`
 showSysInfo "`getUbuntuInfo`"
 
 if [ "$isDone" == "n" ]; then
@@ -17,8 +17,9 @@ if [ "$isDone" == "n" ]; then
 	initFolder
 	showInfo "WSL - Ubuntu 系统环境初始化中"
 	mkClear
-	echo -e "alias clear='/bin/sh /root/.clear.sh'" >> /root/.bashrc
-	source /root/.bashrc
+	echo -e "alias clear='/bin/sh /root/.clear.sh'" >> /etc/profile
+	echo -e "alias docker='podman'" >> /etc/profile
+	source /etc/profile
 
 	# 更换中科大源
 	if [ ! -f /etc/apt/sources.list.bak ]; then
@@ -39,7 +40,7 @@ if [ "$isDone" == "n" ]; then
 	EOF
 	apt update
 
-	setDone
+	setDone "ubuntu"
 	isDone="y"
 else
 	createProjectFolder

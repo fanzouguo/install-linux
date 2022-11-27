@@ -11,7 +11,7 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="27.1.0"
+scricptVer="28.0.0"
 # Docker-compose 是否安装成功
 dockerComposeIsOk=""
 
@@ -321,6 +321,12 @@ function installDocker() {
 	fi
 	stepDone "Docker 安装"
 }
+# 安装 Podman
+function installPodman() {
+	yum install -y podman
+	pip3 install podman-compose
+	stepDone "Podman 安装"
+}
 # 安装 cockpit
 function installCockpit() {
 	showSucc "安装 Cockpit"
@@ -394,9 +400,12 @@ function getReport() {
 	showSucc 资源包
 	ls -laF /$ROOT_PATH/common/.smpoo
 	cd ~
-	showSucc "Docker 及组件"
-	docker -v
-	docker-compose --version
+	# showSucc "Docker 及组件"
+	# docker -v
+	# docker-compose --version
+	showSucc "Podman 及组件"
+	podman -v
+	podman-compose --version
 	cd ~
 
 	if [ "$dockerComposeIsOk" == "" ]; then
@@ -422,8 +431,10 @@ function fullInstall() {
 	changeSource
 	# 0.3 系统环境预安装
 	preInstall
-	# 0.4 安装 Docker
-	installDocker
+	# # 0.4 安装 Docker
+	# installDocker
+	# 0.4 安装 Podman
+	installPodman
 	# 0.5 安装 Cockpit
 	installCockpit
 	# 0.6 公共资源初始化

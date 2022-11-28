@@ -11,7 +11,7 @@ EXEC_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 # 本机内网IP地址
 ipStr=$(/sbin/ifconfig -a | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | tr -d "addr:")
 # 本脚本文件版本号（会在 pnpm build 时自动改变）
-scricptVer="28.1.0"
+scricptVer="28.2.0"
 # Docker-compose 是否安装成功
 dockerComposeIsOk=""
 
@@ -202,6 +202,7 @@ function preparePath() {
 	mkdir -pv $ROOT_PATH/logs/$PROJECT_NAME $ROOT_PATH/backup/$PROJECT_NAME
 
 	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/data
+	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/corn
 	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/dockerFile
 	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/html/{docs,files,www}
 	mkdir -pv $ROOT_PATH/project/$PROJECT_NAME/nodePj/{node_modules,space}
